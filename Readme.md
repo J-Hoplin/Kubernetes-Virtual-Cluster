@@ -88,6 +88,13 @@ key of config data becomes, node instance's name.
 
 Recommend to set at lease `1 cpu` and `2048M of RAM`, `15GB of disk` per node
 
+### kubectl
+When you initialize the cluster, the kubectl on the host pc is connected to the virtual cluster. The previous existing kubectl setting will be saved as `~/.kube/config_cp`.
+
+Execute `kubectl get nodes` in host machine after initiate cluster!
+
+![img](./img/2.png)
+
 ### Scale out worker node
 You initialize cluster. But let's say that you want to add new worker node in cluster. You don't need to terminate and re initialize cluster. Just add worker node information in [worker node config](./nodes/worker/config.json) 
 
