@@ -1,4 +1,4 @@
-Kubernetes Virtual Cluster
+Kubernetes Virtual Cluster Simulator
 ===
 #### **Project's idea is inspired by [@Present Jay](https://github.com/PresentJay/lightweight-kubernetes-sandbox-cli)!** 
 ***
