@@ -14,7 +14,8 @@ Kubernetes Virtual Cluster Simulator
   - Least : 4 Core CPUs
   - Stable : 8 Core CPUs or upper
 - Memory
-  - Least : 16 GB of RAM (Not easy in an 8GB RAM environment)
+  - If your environment is 8GB of RAM : 1 master, 1 worker node is recommended
+  - Least : 16 GB of RAM
   - Stable : 32 GB of RAM or upper
 - Python3 : ver 3.8 upper
 ***
@@ -28,6 +29,8 @@ Kubernetes Virtual Cluster Simulator
 ## Commands
 
 - Initialize cluster
+
+  - Due to lack of computing resources, master / worker node not initialize properly sometimes. Please check computing resource before initiate cluster. (Usually occured in 8/16 GB RAM PC)
 
   ```
   python3 cluster.py -c init

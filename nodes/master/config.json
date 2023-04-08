@@ -3,7 +3,7 @@
         "cpu": "2",
         "memory": "2048M",
         "disk": "20G",
-        "ip": "192.168.64.98",
-        "token": "K10f4ac6de2db0686ee9e65ea8864e67dc05588d5a6d25294119af538eb93b6b371::server:cdff9a57fe9b0b3f64d90775d8373cbd"
+        "ip": "",
+        "token": ""
     }
 }
