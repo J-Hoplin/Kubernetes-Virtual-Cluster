@@ -39,11 +39,17 @@ class ImproperMasterNodeGenerated(Exception):
         """
         super().__init__(statement)
 
+class MasterNodeNotFound(Exception):
+    def __init__(self):
+        super().__init__("Master node not generated! Please initiate cluster before add worker node")
 
 class RequiredCommandLineOptionLost(Exception):
     def __init__(self, name):
         super().__init__(f"Required option '{name}' lost")
 
+class NodeNotFound(Exception):
+    def __init__(self,name):
+        super().__init__(f"Node not found : {name}")
 
 class InvalidConfigType(Exception):
     def __init__(self, tp):

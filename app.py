@@ -95,7 +95,8 @@ class Resolver(object):
 
         masterNodeIP = getNodeIP(masterNodeName)
         masterConfig[masterNodeName]["ip"] = masterNodeIP
-        masterNodeToken = subprocess.run(["bash", "./nodes/getMasterToken.sh", masterNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+        masterNodeToken = subprocess.run(
+            ["bash", "./nodes/getMasterToken.sh", masterNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
         masterConfig[masterNodeName]["token"] = masterNodeToken
 
         if (not masterNodeIP) or (not masterNodeToken):
@@ -107,7 +108,7 @@ class Resolver(object):
 
         # Initialize worker node config
         for i, j in workerConfig.items():
-            workerNodeName: str = i
+            workerNodeName: str = "-".join(i.split(" "))
             print(
                 Fore.GREEN + f"Initiating worker node : {workerNodeName} ..." + Style.RESET_ALL)
             workerNodeInfo: dict = j
@@ -126,7 +127,7 @@ class Resolver(object):
             NodeInit(workerNodeName, workerNodeCPU, workerNodeMemory,
                      workerNodeStorage, NodeType.WORKER, masterNodeToken, masterNodeIP)
             workerNodeIP = getNodeIP(workerNodeName)
-            workerConfig[workerNodeName]["ip"] = workerNodeIP
+            workerConfig[i]["ip"] = workerNodeIP
             print(
                 Fore.GREEN + f"Complete to build worker node : {workerNodeName} ..." + Style.RESET_ALL)
 
@@ -157,17 +158,20 @@ class Resolver(object):
         instanceList = list(workerConfig.keys())
         instanceList.append(Assets.MASTER_NODE_KEY)
         for i in instanceList:
+            i = "-".join(i.split(" "))
+            print(Fore.GREEN + f"Terminating node : {i}")
             subprocess.run(["bash", "./nodes/terminateCluster.sh", i])
 
         if self.typeChecker(masterConfig[Assets.MASTER_NODE_KEY], dict):
             if "ip" in masterConfig[Assets.MASTER_NODE_KEY]:
                 masterConfig[Assets.MASTER_NODE_KEY]["ip"] = ""
+            if "token" in masterConfig[Assets.MASTER_NODE_KEY]:
+                masterConfig[Assets.MASTER_NODE_KEY]["token"] = ""
 
         for i, j in workerConfig.items():
             if self.typeChecker(j, dict):
                 if "ip" in j:
                     workerConfig[i]["ip"] = ""
-
         self.saveConfig(Assets.MASTER_CONFIG, masterConfig)
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
 
@@ -184,15 +188,35 @@ class Resolver(object):
         if not self.typeChecker(workerConfig[name], dict):
             raise exceptions.InvalidConfigType()
 
-        workerNodeName = name
-        workerNodeInfo = workerConfig[workerNodeName]
-        workerNodeCPU = workerNodeInfo.get('cpu', os.environ['WORKER_DEFAULT_CPU'])
-        workerNodeMemory = workerNodeInfo.get('memory', os.environ['WORKER_DEFAULT_MEMORY'])
-        workerNodeStorage = workerNodeInfo.get('disk', os.environ['WORKER_DEFAULT_STORAGE'])
+        workerNodeName = "-".join(name.split(" "))
+        workerNodeInfo = workerConfig[name]
+        workerNodeCPU = workerNodeInfo.get(
+            'cpu', os.environ['WORKER_DEFAULT_CPU'])
+        workerNodeMemory = workerNodeInfo.get(
+            'memory', os.environ['WORKER_DEFAULT_MEMORY'])
+        workerNodeStorage = workerNodeInfo.get(
+            'disk', os.environ['WORKER_DEFAULT_STORAGE'])
         token = masterConfig[Assets.MASTER_NODE_KEY]["token"]
         ip = masterConfig[Assets.MASTER_NODE_KEY]["ip"]
-        print(Fore.GREEN + f"Initiating worker node : {workerNodeName} ..." + Style.RESET_ALL)
-        subprocess.run(["bash", "./nodes/nodeInit.sh", workerNodeName, workerNodeCPU,workerNodeMemory, workerNodeStorage, NodeType.WORKER, token, ip], stdout=subprocess.PIPE)
-        print(Fore.GREEN + f"Complete to build worker node : {workerNodeName} ..." + Style.RESET_ALL)
-        workerConfig[name]["ip"] = subprocess.run(["bash", "./nodes/getNodeIP.sh", workerNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-        self.saveConfig(Assets.WORKER_CONFIG,workerConfig)
+        if (not ip) or (not token):
+            raise exceptions.MasterNodeNotFound()
+        print(
+            Fore.GREEN + f"Initiating worker node : {workerNodeName} ..." + Style.RESET_ALL)
+        subprocess.run(["bash", "./nodes/nodeInit.sh", workerNodeName, workerNodeCPU,
+                       workerNodeMemory, workerNodeStorage, NodeType.WORKER, token, ip], stdout=subprocess.PIPE)
+        print(
+            Fore.GREEN + f"Complete to build worker node : {workerNodeName} ..." + Style.RESET_ALL)
+        workerConfig[name]["ip"] = subprocess.run(
+            ["bash", "./nodes/getNodeIP.sh", workerNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+        self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
+
+    def connectShell(self,name):
+        # Get worker node config
+        workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
+        nodeList:list = list(workerConfig.keys())
+        nodeList.append(Assets.MASTER_NODE_KEY)
+        nodeList = list(map(lambda x: "-".join(x.split(" ")),nodeList))
+        name = "-".join(name.split(" "))
+        if name not in nodeList:
+            raise exceptions.NodeNotFound(name)
+        subprocess.run(["bash","./nodes/connectShell.sh",name])
