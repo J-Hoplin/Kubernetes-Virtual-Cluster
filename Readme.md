@@ -16,7 +16,7 @@ Kubernetes Virtual Cluster
 - Memory
   - Least : 16 GB of RAM (Not easy in an 8GB RAM environment)
   - Stable : 32 GB of RAM or upper
-- Python3 v 3.8 upper
+- Python3 : ver 3.8 upper
 ***
 ## Pre-Requisite
 
@@ -109,3 +109,7 @@ and use command under below
 ```
 python3 cluster.py -c add -n <new-node-name>
 ```
+***
+## TODO List
+- [ ] Polymorphism Support about helm chart
+- [ ] Apply dashboard
