@@ -91,7 +91,7 @@ Recommend to set at lease `1 cpu` and `2048M of RAM`, `15GB of disk` per node
 ### kubectl
 When you initialize the cluster, the kubectl on the host pc is connected to the virtual cluster. The previous existing kubectl setting will be saved as `~/.kube/config_cp`.
 
-Execute `kubectl get nodes` in host machine after initiate cluster!
+Execute `kubectl get nodes` in host machine for check after initiate cluster!
 
 ![img](./img/2.png)
 
