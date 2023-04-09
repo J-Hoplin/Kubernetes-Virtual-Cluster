@@ -1,14 +1,14 @@
 {
-    "worker-node1": {
+    "worker": {
         "cpu": "1",
         "memory": "2048M",
         "disk": "20G",
-        "ip": ""
+        "ip": "192.168.64.122"
     },
-    "worker-node2": {
+    "WORKER2": {
         "cpu": "1",
         "memory": "2048M",
         "disk": "20G",
-        "ip": ""
+        "ip": "192.168.64.123"
     }
 }
