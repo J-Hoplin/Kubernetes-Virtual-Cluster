@@ -12,7 +12,6 @@ class Assets(object):
     KUBE_CONFIG_DIR = f"{os.environ['HOME']}/.kube"
     KUBE_CONFIG = f"{os.environ['HOME']}/.kube/config"
 
-
 class NodeType(object):
     MASTER = 'master'
     WORKER = 'worker'
