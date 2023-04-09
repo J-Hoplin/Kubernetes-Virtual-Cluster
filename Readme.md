@@ -41,7 +41,7 @@ Kubernetes Virtual Cluster Simulator
   ```
   python3 cluster.py -c terminate
   ```
-- Add new worker node to cluster (Scale-Out)
+- Add new worker-node to cluster (Scale-Out)
   - `-n` option is required when using `-c add` option
   ```
   python3 cluster.py -c add -n <new-node-name>
@@ -51,6 +51,13 @@ Kubernetes Virtual Cluster Simulator
   ```
   python3 cluster.py -c shell -n <node-name>
   ```
+- Delete worker-node from cluster
+  - **Warning : This option ignore daemonsets and delete local datas of node!**
+  - `-n` option is required when using `-c delete` option
+  ```
+  python3 cluster.py -c delete -n <node-name>
+  ```
+
 ***
 ## How to use?
 ### Cluster Node Configuration
