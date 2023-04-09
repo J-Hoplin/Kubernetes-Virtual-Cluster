@@ -14,6 +14,7 @@ parser.add_argument(
     Initiate cluster with : 'init'
     Terminate cluster with : 'terminate'
     Add node with : 'add'
+    Delete node with : 'delete'
     Connect to node's shell with : 'shell'
     """, required=True)
 parser.add_argument(
@@ -22,17 +23,24 @@ parser.add_argument(
 
 argList = parser.parse_args()
 
-if argList.cluster == "init":
-    resolver.cluster_init()
-elif argList.cluster == "terminate":
-    resolver.terminate_cluster()
-elif argList.cluster == "add":
-    if not argList.name:
-        raise exceptions.RequiredCommandLineOptionLost('-n')
-    resolver.add_node(argList.name)
-elif argList.cluster == "shell":
-    if not argList.name:
-        raise exceptions.RequiredCommandLineOptionLost('-n')
-    resolver.connectShell(argList.name)
-else:
-    raise exceptions.WrongArgumentGiven()
+try:
+    if argList.cluster == "init":
+        resolver.cluster_init()
+    elif argList.cluster == "terminate":
+        resolver.terminate_cluster()
+    elif argList.cluster == "add":
+        if not argList.name:
+            raise exceptions.RequiredCommandLineOptionLost('-n')
+        resolver.add_node(argList.name)
+    elif argList.cluster == "shell":
+        if not argList.name:
+            raise exceptions.RequiredCommandLineOptionLost('-n')
+        resolver.connectShell(argList.name)
+    elif argList.cluster == "delete":
+        if not argList.name:
+            raise exceptions.RequiredCommandLineOptionLost('-n')
+        resolver.deleteNode(argList.name)
+    else:
+        raise exceptions.WrongArgumentGiven()
+except Exception as e:
+    print(str(e))

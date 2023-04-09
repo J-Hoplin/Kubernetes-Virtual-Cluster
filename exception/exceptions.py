@@ -24,8 +24,8 @@ class NoneTypeValueDetected(Exception):
 
 
 class WrongArgumentGiven(Exception):
-    def __init__(self):
-        super().__init__("Wrong argument value given")
+    def __init__(self,msg):
+        super().__init__(f"Wrong argument value given : {msg}")
 
 
 class ImproperMasterNodeGenerated(Exception):
@@ -43,6 +43,9 @@ class MasterNodeNotFound(Exception):
     def __init__(self):
         super().__init__("Master node not generated! Please initiate cluster before add worker node")
 
+class InvalidNodeGenerationDetected(Exception):
+    def __init__(self,msg):
+        super().__init__(msg)
 class RequiredCommandLineOptionLost(Exception):
     def __init__(self, name):
         super().__init__(f"Required option '{name}' lost")

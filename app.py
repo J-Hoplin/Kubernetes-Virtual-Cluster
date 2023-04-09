@@ -9,9 +9,9 @@ class Assets(object):
     MASTER_NODE_KEY = 'master-node'
     MASTER_CONFIG = './nodes/master/config.json'
     WORKER_CONFIG = './nodes/worker/config.json'
+    SCRIPT_PATH= './nodes/scripts'
     KUBE_CONFIG_DIR = f"{os.environ['HOME']}/.kube"
     KUBE_CONFIG = f"{os.environ['HOME']}/.kube/config"
-
 
 class NodeType(object):
     MASTER = 'master'
@@ -34,22 +34,52 @@ class Resolver(object):
         with open(file, 'w') as config:
             json.dump(object, config, indent=4)
 
+    def getNodeName(self,name: str):
+        return "-".join(name.lower().split(" "))
+    def getCriticalMessage(self,msg):
+        return Fore.RED + f"Critical : {msg}" + Style.RESET_ALL
+
+    def getNormalMessage(self,msg):
+        return Fore.GREEN + msg + Style.RESET_ALL
+    def getWarningMessage(self,msg):
+        return Fore.YELLOW + f"Warn : {msg}" + Style.RESET_ALL
+
+    def getSpecialMessage(self,msg):
+        return Fore.MAGENTA + msg + Style.RESET_ALL
+
+    def checkInstanceNameNotInUse(self,name) -> bool:
+        hit = True
+        '''
+        Slice 0 index value : 0 index result of command is index of column
+        '''
+        for i in map(lambda x: x.split(),
+                     subprocess.run(["multipass", "list"], stdout=subprocess.PIPE)
+                             .stdout.decode('utf-8')
+                             .split("\n")[1:]):
+            try:
+                if i[0] == name:
+                    hit = False
+                    break
+            except:
+                continue
+        return hit
+
     def cluster_init(self):
         os.system('clear')
 
         def NodeInit(name, cpu, memory, disk, tp, *args):
             if tp == NodeType.MASTER:
-                subprocess.run(["bash", "./nodes/nodeInit.sh", name,
+                subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/nodeInit.sh", name,
                                cpu, memory, disk, tp], stdout=subprocess.PIPE)
             elif tp == NodeType.WORKER:
                 token, ip = args
-                subprocess.run(["bash", "./nodes/nodeInit.sh", name, cpu,
+                subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/nodeInit.sh", name, cpu,
                                memory, disk, tp, token, ip], stdout=subprocess.PIPE)
             else:
                 raise exceptions.IllegalControlException("Invalid node type")
 
         def getNodeIP(name):
-            return subprocess.run(["bash", "./nodes/getNodeIP.sh", name], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            return subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/getNodeIP.sh", name], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
 
         if not os.path.exists('./nodes'):
             raise exceptions.DirectoryNotFound('nodes')
@@ -57,19 +87,25 @@ class Resolver(object):
         # Get master node config
         masterConfig: dict = self.readConfig(Assets.MASTER_CONFIG)
 
-        print(Fore.GREEN + "Complete to load : Master config" + Style.RESET_ALL)
+        print(self.getNormalMessage("Complete to load : Master config"))
 
         # Get worker node config
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
 
-        print(Fore.GREEN + "Complete to load : Worker config" + Style.RESET_ALL)
+        print(self.getNormalMessage("Complete to load : Worker config"))
 
         # Initialize master node config
 
         if Assets.MASTER_NODE_KEY not in masterConfig:
             raise exceptions.MasterNodeConfigNotFound()
 
-        print(Fore.GREEN + "Initiating master node ..." + Style.RESET_ALL)
+        # Check
+        if not self.checkInstanceNameNotInUse(Assets.MASTER_NODE_KEY):
+            raise exceptions.InvalidNodeGenerationDetected(
+                self.getCriticalMessage(f"Instance with '{Assets.MASTER_NODE_KEY}' already in use! Stop generating cluster.")
+            )
+
+        print(self.getNormalMessage(f"Initiating {Assets.MASTER_NODE_KEY} ..."))
         masterNodeName: str = Assets.MASTER_NODE_KEY
         masterNodeInfo: dict = masterConfig[masterNodeName]
 
@@ -96,28 +132,30 @@ class Resolver(object):
         masterNodeIP = getNodeIP(masterNodeName)
         masterConfig[masterNodeName]["ip"] = masterNodeIP
         masterNodeToken = subprocess.run(
-            ["bash", "./nodes/getMasterToken.sh", masterNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            ["bash", f"{Assets.SCRIPT_PATH}/getMasterToken.sh", masterNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
         masterConfig[masterNodeName]["token"] = masterNodeToken
 
         if (not masterNodeIP) or (not masterNodeToken):
             raise exceptions.ImproperMasterNodeGenerated()
 
-        print(f"Master Node IP : {masterNodeIP}")
-        print(f"Master Node Token : {masterNodeToken}")
-        print(Fore.GREEN + "Complete to build master node ..." + Style.RESET_ALL)
+        print(self.getSpecialMessage(f"Master Node IP : {masterNodeIP}"))
+        print(self.getSpecialMessage(f"Master Node Token : {masterNodeToken}"))
+        print(self.getNormalMessage("Complete to build master node ..."))
 
         # Initialize worker node config
         for i, j in workerConfig.items():
-            workerNodeName: str = "-".join(i.split(" "))
-            print(
-                Fore.GREEN + f"Initiating worker node : {workerNodeName} ..." + Style.RESET_ALL)
+            workerNodeName: str = self.getNodeName(i)
+
+            if not self.checkInstanceNameNotInUse(workerNodeName):
+                print(self.getCriticalMessage(f"Instance with name '{workerNodeName}' already in use! Ignore generating worker-node config '{i}'"))
+                continue
+
             workerNodeInfo: dict = j
 
             if not self.typeChecker(workerNodeInfo, dict):
-                print(
-                    Fore.RED + f"Invalid config type of worker node : {workerNodeName}! Ignore generation" + Style.RESET_ALL)
+                print(self.getCriticalMessage(f"Invalid config type of worker node : {workerNodeName}!"))
                 continue
-
+            print(self.getNormalMessage(f"Initiating worker node : {workerNodeName} ..." ))
             workerNodeCPU = workerNodeInfo.get(
                 'cpu', os.environ['WORKER_DEFAULT_CPU'])
             workerNodeMemory = workerNodeInfo.get(
@@ -128,8 +166,7 @@ class Resolver(object):
                      workerNodeStorage, NodeType.WORKER, masterNodeToken, masterNodeIP)
             workerNodeIP = getNodeIP(workerNodeName)
             workerConfig[i]["ip"] = workerNodeIP
-            print(
-                Fore.GREEN + f"Complete to build worker node : {workerNodeName} ..." + Style.RESET_ALL)
+            print(self.getNormalMessage(f"Complete to build worker node : {workerNodeName} ..."))
 
         self.saveConfig(Assets.MASTER_CONFIG, masterConfig)
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
@@ -142,9 +179,8 @@ class Resolver(object):
         if os.path.exists(Assets.KUBE_CONFIG):
             os.rename(Assets.KUBE_CONFIG,
                       f"{Assets.KUBE_CONFIG_DIR}/config_cp")
-            print(
-                Fore.GREEN + f"Saving previous kubectl config file as {Assets.KUBE_CONFIG_DIR}/config_cp ..." + Style.RESET_ALL)
-        subprocess.run(["bash", "./nodes/getKubeConfig.sh",
+            print(self.getSpecialMessage(f"Saving previous kubectl config file as {Assets.KUBE_CONFIG_DIR}/config_cp ..."))
+        subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/getKubeConfig.sh",
                        masterNodeName, masterNodeIP])
 
     def terminate_cluster(self):
@@ -158,9 +194,9 @@ class Resolver(object):
         instanceList = list(workerConfig.keys())
         instanceList.append(Assets.MASTER_NODE_KEY)
         for i in instanceList:
-            i = "-".join(i.split(" "))
-            print(Fore.GREEN + f"Terminating node : {i}")
-            subprocess.run(["bash", "./nodes/terminateCluster.sh", i])
+            i = self.getNodeName(i)
+            print(self.getNormalMessage(f"Terminating node : {i}"))
+            subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/terminateCluster.sh", i])
 
         if self.typeChecker(masterConfig[Assets.MASTER_NODE_KEY], dict):
             if "ip" in masterConfig[Assets.MASTER_NODE_KEY]:
@@ -175,20 +211,28 @@ class Resolver(object):
         self.saveConfig(Assets.MASTER_CONFIG, masterConfig)
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
 
-        subprocess.run(["multipass", "purge"])
-        print(Fore.GREEN + "Complete to terminate cluster!")
+        subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/purgeInstance.sh"])
+        print(self.getNormalMessage("Complete to terminate cluster!"))
 
     def add_node(self, name):
         masterConfig: dict = self.readConfig(Assets.MASTER_CONFIG)
         # Get worker node config
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
+
+        # name should be same with as in config file
         if name not in workerConfig.keys():
-            raise exceptions.WrongArgumentGiven()
+            raise exceptions.WrongArgumentGiven(f"Name '{name}' not found in worker config")
+
+        workerNodeName = self.getNodeName(name)
+
+        # Check instance name in use
+        if not self.checkInstanceNameNotInUse(workerNodeName):
+            raise exceptions.InvalidNodeGenerationDetected(
+                self.getCriticalMessage(f"Name with '{workerNodeName}' already in use! Ignore generating worker-node config '{name}'"))
 
         if not self.typeChecker(workerConfig[name], dict):
-            raise exceptions.InvalidConfigType()
+            raise exceptions.InvalidConfigType(dict)
 
-        workerNodeName = "-".join(name.split(" "))
         workerNodeInfo = workerConfig[name]
         workerNodeCPU = workerNodeInfo.get(
             'cpu', os.environ['WORKER_DEFAULT_CPU'])
@@ -200,23 +244,36 @@ class Resolver(object):
         ip = masterConfig[Assets.MASTER_NODE_KEY]["ip"]
         if (not ip) or (not token):
             raise exceptions.MasterNodeNotFound()
-        print(
-            Fore.GREEN + f"Initiating worker node : {workerNodeName} ..." + Style.RESET_ALL)
-        subprocess.run(["bash", "./nodes/nodeInit.sh", workerNodeName, workerNodeCPU,
+        print(self.getNormalMessage(f"Initiating worker node : {workerNodeName} ..."))
+        subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/nodeInit.sh", workerNodeName, workerNodeCPU,
                        workerNodeMemory, workerNodeStorage, NodeType.WORKER, token, ip], stdout=subprocess.PIPE)
-        print(
-            Fore.GREEN + f"Complete to build worker node : {workerNodeName} ..." + Style.RESET_ALL)
+        print(self.getNormalMessage(f"Complete to build worker node : {workerNodeName} ..."))
         workerConfig[name]["ip"] = subprocess.run(
-            ["bash", "./nodes/getNodeIP.sh", workerNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            ["bash", f"{Assets.SCRIPT_PATH}/getNodeIP.sh", workerNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
 
     def connectShell(self,name):
-        # Get worker node config
+        node_name = self.getNodeName(name)
+        if self.checkInstanceNameNotInUse(node_name):
+            raise exceptions.NodeNotFound(node_name)
+        subprocess.run(["bash",f"{Assets.SCRIPT_PATH}/connectShell.sh",node_name])
+
+    def deleteNode(self,name):
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
-        nodeList:list = list(workerConfig.keys())
-        nodeList.append(Assets.MASTER_NODE_KEY)
-        nodeList = list(map(lambda x: "-".join(x.split(" ")),nodeList))
-        name = "-".join(name.split(" "))
-        if name not in nodeList:
-            raise exceptions.NodeNotFound(name)
-        subprocess.run(["bash","./nodes/connectShell.sh",name])
+
+        node_name = self.getNodeName(name)
+        if node_name == Assets.MASTER_NODE_KEY:
+            raise exceptions.IllegalControlException("Can't delete worker node by alone!")
+
+        if self.checkInstanceNameNotInUse(node_name):
+            raise exceptions.NodeNotFound(node_name)
+        print(self.getNormalMessage(f"Delete node '{node_name}' from cluster"))
+        subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/deleteNode.sh",Assets.MASTER_NODE_KEY,node_name])
+        print(self.getNormalMessage(f"Complete to delete node '{node_name}' from cluster"))
+        print(self.getNormalMessage(f"Terminating instance : '{node_name}'" ))
+        subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/terminateCluster.sh", node_name])
+        print(self.getNormalMessage(f"Complete to terminate instance : '{node_name}'"))
+        workerConfig[name]["ip"] = ""
+        self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
+        subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/purgeInstance.sh"])
+
