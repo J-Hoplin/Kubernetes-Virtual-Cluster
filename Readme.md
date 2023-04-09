@@ -5,6 +5,8 @@ Kubernetes Virtual Cluster Simulator
 ![img](./img/1.png)
 **Virtual multi-node kubernetes cluster with Canoniacal Multipass!**
 ***
+Version : 0.0.2
+***
 ## Required Spec
 
 **Standard under below is environment of 1 master & 2 worker node**
