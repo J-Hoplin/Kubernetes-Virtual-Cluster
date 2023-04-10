@@ -32,7 +32,7 @@ Version : 0.0.2
 
 - Initialize cluster
 
-  - Due to lack of computing resources, master / worker node not initialize properly sometimes. Please check computing resource before initiate cluster. (Usually occured in 8/16 GB RAM PC)
+  - **Due to lack of computing resources, master / worker node may not initialize properly sometimes. Please check computing resource before initiate cluster. (Usually occured in 8/16 GB RAM PC)**
 
   ```
   python3 cluster.py -c init
