@@ -27,6 +27,10 @@ Version : 0.0.2
   - https://multipass.run
 - Install kubectl
   - https://kubernetes.io/docs/tasks/tools/
+
+- Install helm
+  - https://helm.sh/docs/intro/install/
+
 ***
 ## Commands
 
