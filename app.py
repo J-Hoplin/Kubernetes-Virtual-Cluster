@@ -9,7 +9,7 @@ class Assets(object):
     MASTER_NODE_KEY = 'master-node'
     MASTER_CONFIG = './nodes/master/config.json'
     WORKER_CONFIG = './nodes/worker/config.json'
-    SCRIPT_PATH= './nodes/scripts'
+    SCRIPT_PATH= './scripts'
     KUBE_CONFIG_DIR = f"{os.environ['HOME']}/.kube"
     KUBE_CONFIG = f"{os.environ['HOME']}/.kube/config"
 
@@ -181,7 +181,7 @@ class Resolver(object):
                       f"{Assets.KUBE_CONFIG_DIR}/config_cp")
             print(self.getSpecialMessage(f"Saving previous kubectl config file as {Assets.KUBE_CONFIG_DIR}/config_cp ..."))
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/getKubeConfig.sh",
-                       masterNodeName, masterNodeIP])
+                       masterNodeName, masterNodeIP, Assets.KUBE_CONFIG])
 
     def terminate_cluster(self):
         print("It may take a while... please wait")
