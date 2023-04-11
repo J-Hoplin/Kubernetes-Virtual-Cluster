@@ -182,6 +182,7 @@ class Resolver(object):
             print(self.getSpecialMessage(f"Saving previous kubectl config file as {Assets.KUBE_CONFIG_DIR}/config_cp ..."))
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/getKubeConfig.sh",
                        masterNodeName, masterNodeIP, Assets.KUBE_CONFIG])
+        print(self.getSpecialMessage(f"🚀 Cluster ready!"))
 
     def terminate_cluster(self):
         print("It may take a while... please wait")
