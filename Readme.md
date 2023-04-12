@@ -30,7 +30,22 @@ Version : 0.0.2
 
 - Install helm
   - https://helm.sh/docs/intro/install/
+***
+## Before start
 
+1. Clone repository
+
+```
+git clone https://github.com/J-hoplin1/K3S-Virtual-Cluster.git
+
+cd K3S-Virtual-Cluster
+```
+
+2. Install requirements.txt
+
+```
+pip3 install -r requirements.txt
+```
 ***
 ## Commands
 

@@ -1,8 +1,8 @@
-import subprocess
-import json
-import os
+import subprocess,os
 from exception import exceptions
-from colorama import Fore, Style
+from utils.utility import Utility
+from decorator.instanceNameAlreadyTakenChecker import InstanceNameAlreadyTakenChecker
+from decorator.instanceExistChecker import InstanceExistChecker
 
 
 class Assets(object):
@@ -12,57 +12,16 @@ class Assets(object):
     SCRIPT_PATH= './scripts'
     KUBE_CONFIG_DIR = f"{os.environ['HOME']}/.kube"
     KUBE_CONFIG = f"{os.environ['HOME']}/.kube/config"
+    KWARGS_WORKER_NODE_KEY='node_name'
 
 class NodeType(object):
     MASTER = 'master'
     WORKER = 'worker'
 
 
-class Resolver(object):
+class Resolver(Utility):
     def __init__(self):
         pass
-
-    def typeChecker(self, obj, tp):
-        return type(obj) == tp
-
-    def readConfig(self, file) -> dict:
-        with open(file, 'r') as config:
-            content: dict = json.load(config)
-            return content
-
-    def saveConfig(self, file, object):
-        with open(file, 'w') as config:
-            json.dump(object, config, indent=4)
-
-    def getNodeName(self,name: str):
-        return "-".join(name.lower().split(" "))
-    def getCriticalMessage(self,msg):
-        return Fore.RED + f"Critical : {msg}" + Style.RESET_ALL
-
-    def getNormalMessage(self,msg):
-        return Fore.GREEN + msg + Style.RESET_ALL
-    def getWarningMessage(self,msg):
-        return Fore.YELLOW + f"Warn : {msg}" + Style.RESET_ALL
-
-    def getSpecialMessage(self,msg):
-        return Fore.MAGENTA + msg + Style.RESET_ALL
-
-    def checkInstanceNameNotInUse(self,name) -> bool:
-        hit = True
-        '''
-        Slice 0 index value : 0 index result of command is index of column
-        '''
-        for i in map(lambda x: x.split(),
-                     subprocess.run(["multipass", "list"], stdout=subprocess.PIPE)
-                             .stdout.decode('utf-8')
-                             .split("\n")[1:]):
-            try:
-                if i[0] == name:
-                    hit = False
-                    break
-            except:
-                continue
-        return hit
 
     def cluster_init(self):
         os.system('clear')
@@ -215,7 +174,8 @@ class Resolver(object):
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/purgeInstance.sh"])
         print(self.getNormalMessage("Complete to terminate cluster!"))
 
-    def add_node(self, name):
+    @InstanceNameAlreadyTakenChecker()
+    def add_node(self, name,**kwargs):
         masterConfig: dict = self.readConfig(Assets.MASTER_CONFIG)
         # Get worker node config
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
@@ -224,12 +184,7 @@ class Resolver(object):
         if name not in workerConfig.keys():
             raise exceptions.WrongArgumentGiven(f"Name '{name}' not found in worker config")
 
-        workerNodeName = self.getNodeName(name)
-
-        # Check instance name in use
-        if not self.checkInstanceNameNotInUse(workerNodeName):
-            raise exceptions.InvalidNodeGenerationDetected(
-                self.getCriticalMessage(f"Name with '{workerNodeName}' already in use! Ignore generating worker-node config '{name}'"))
+        workerNodeName = kwargs[Assets.KWARGS_WORKER_NODE_KEY]
 
         if not self.typeChecker(workerConfig[name], dict):
             raise exceptions.InvalidConfigType(dict)
@@ -253,21 +208,19 @@ class Resolver(object):
             ["bash", f"{Assets.SCRIPT_PATH}/getNodeIP.sh", workerNodeName], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
 
-    def connectShell(self,name):
-        node_name = self.getNodeName(name)
-        if self.checkInstanceNameNotInUse(node_name):
-            raise exceptions.NodeNotFound(node_name)
+    @InstanceExistChecker()
+    def connectShell(self,name,**kwargs):
+        node_name = kwargs[Assets.KWARGS_WORKER_NODE_KEY]
         subprocess.run(["bash",f"{Assets.SCRIPT_PATH}/connectShell.sh",node_name])
 
-    def deleteNode(self,name):
+    @InstanceExistChecker()
+    def deleteNode(self,name,**kwargs):
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
 
-        node_name = self.getNodeName(name)
+        node_name = kwargs[Assets.KWARGS_WORKER_NODE_KEY]
         if node_name == Assets.MASTER_NODE_KEY:
             raise exceptions.IllegalControlException("Can't delete worker node by alone!")
 
-        if self.checkInstanceNameNotInUse(node_name):
-            raise exceptions.NodeNotFound(node_name)
         print(self.getNormalMessage(f"Delete node '{node_name}' from cluster"))
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/deleteNode.sh",Assets.MASTER_NODE_KEY,node_name])
         print(self.getNormalMessage(f"Complete to delete node '{node_name}' from cluster"))
@@ -277,4 +230,3 @@ class Resolver(object):
         workerConfig[name]["ip"] = ""
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/purgeInstance.sh"])
-
