@@ -149,7 +149,7 @@ When you initialize the cluster, the kubectl on the host pc is connected to the 
 
 Execute `kubectl get nodes` in host machine for check after initiate cluster!
 
-![img](./img/3.png)
+![img](./img/2.png)
 
 ### Scale out worker node
 

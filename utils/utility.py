@@ -17,8 +17,9 @@ class Utility(object):
     def validateNodeName(self,name: str):
         return bool(re.match('^[A-Za-z0-9][A-Za-z0-9-]*$',name))
 
-    def getCriticalMessage(self,msg):
-        return Fore.RED + f"Critical : {msg}" + Style.RESET_ALL
+    def getCriticalMessage(self,msg,watermark=True):
+        watermark = "Critical : " if watermark else ""
+        return Fore.RED + f"{watermark}{msg}" + Style.RESET_ALL
 
     def getNormalMessage(self,msg):
         return Fore.GREEN + msg + Style.RESET_ALL

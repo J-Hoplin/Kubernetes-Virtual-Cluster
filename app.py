@@ -154,7 +154,7 @@ class Resolver(Utility):
         
         print(f"""\n
 {self.getNormalMessage(f"Success - {nodeCount - failedNodeCount}/{nodeCount}")}
-{self.getCriticalMessage(f"Failed - {failedNodeCount}/{nodeCount}")}
+{self.getCriticalMessage(f"Failed - {failedNodeCount}/{nodeCount}",False)}
         """)
 
 
