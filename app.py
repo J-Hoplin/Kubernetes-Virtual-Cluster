@@ -135,7 +135,7 @@ class Resolver(Utility):
                      workerNodeStorage, NodeType.WORKER, masterNodeToken, masterNodeIP)
             workerNodeIP = getNodeIP(workerNodeName)
             workerConfig[i]["ip"] = workerNodeIP
-            print(self.getNormalMessage(f"Complete to build worker node : {workerNodeName} ..."))
+            print(self.getNormalMessage(f"Complete to build worker node : {workerNodeName} ...\n"))
 
         self.saveConfig(Assets.MASTER_CONFIG, masterConfig)
         self.saveConfig(Assets.WORKER_CONFIG, workerConfig)
