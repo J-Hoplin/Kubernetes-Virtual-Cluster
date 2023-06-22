@@ -1,4 +1,4 @@
-import json,subprocess
+import json,subprocess,re
 from colorama import Fore, Style
 
 class Utility(object):
@@ -14,8 +14,9 @@ class Utility(object):
         with open(file, 'w') as config:
             json.dump(object, config, indent=4)
 
-    def getNodeName(self,name: str):
-        return "-".join(name.lower().split(" "))
+    def validateNodeName(self,name: str):
+        return bool(re.match('^[A-Za-z0-9][A-Za-z0-9-]*$',name))
+
     def getCriticalMessage(self,msg):
         return Fore.RED + f"Critical : {msg}" + Style.RESET_ALL
 

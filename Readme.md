@@ -1,12 +1,18 @@
-Kubernetes Virtual Cluster Simulator
-===
-#### **Project's idea is inspired by [@Present Jay](https://github.com/PresentJay/lightweight-kubernetes-sandbox-cli)!** 
-***
+# Kubernetes Virtual Cluster Simulator
+
+#### **Project's idea is inspired by [@Present Jay](https://github.com/PresentJay/lightweight-kubernetes-sandbox-cli)!**
+
+---
+
 ![img](./img/1.png)
 **Virtual multi-node kubernetes cluster with Canoniacal Multipass!**
-***
+
+---
+
 Version : 0.0.2
-***
+
+---
+
 ## Required Spec
 
 **Standard under below is environment of 1 master & 2 worker node**
@@ -20,17 +26,22 @@ Version : 0.0.2
   - Least : 16 GB of RAM
   - Stable : 32 GB of RAM or upper
 - Python3 : ver 3.8 upper
-***
+
+---
+
 ## Pre-Requisite
 
 - Install Multipass
   - https://multipass.run
 - Install kubectl
+
   - https://kubernetes.io/docs/tasks/tools/
 
 - Install helm
   - https://helm.sh/docs/intro/install/
-***
+
+---
+
 ## Before start
 
 1. Clone repository
@@ -46,7 +57,9 @@ cd K3S-Virtual-Cluster
 ```
 pip3 install -r requirements.txt
 ```
-***
+
+---
+
 ## Commands
 
 - Initialize cluster
@@ -62,6 +75,7 @@ pip3 install -r requirements.txt
   ```
   python3 cluster.py -c terminate
   ```
+
 - Add new worker-node to cluster (Scale-Out)
   - `-n` option is required when using `-c add` option
   ```
@@ -79,8 +93,10 @@ pip3 install -r requirements.txt
   python3 cluster.py -c delete -n <node-name>
   ```
 
-***
+---
+
 ## How to use?
+
 ### Cluster Node Configuration
 
 **You need to recognize that both master/worker node config data should be object type.**
@@ -90,15 +106,16 @@ is located in [nodes/master/config.json](./nodes/master/config.json), and should
 
 ```json
 {
-    "master-node": {
-        "cpu": "2",
-        "memory": "2048M",
-        "disk": "20G",
-        "ip": "",
-        "token": ""
-    }
+  "master-node": {
+    "cpu": "2",
+    "memory": "2048M",
+    "disk": "20G",
+    "ip": "",
+    "token": ""
+  }
 }
 ```
+
 **No limitation of worker node count.** You can add worker node in [nodes/worker/config.json](./nodes/worker/config.json). Add with following format
 
 ```
@@ -115,19 +132,28 @@ is located in [nodes/master/config.json](./nodes/master/config.json), and should
   ...,
 }
 ```
+
 key of config data becomes, node instance's name.
+
+Please obey worker-node name based on this regular expression
+
+```
+^[A-Za-z0-9][A-Za-z0-9-]*$
+```
 
 Recommend to set at lease `1 cpu` and `2048M of RAM`, `15GB of disk` per node
 
 ### kubectl
+
 When you initialize the cluster, the kubectl on the host pc is connected to the virtual cluster. The previous existing kubectl setting will be saved as `~/.kube/config_cp`.
 
 Execute `kubectl get nodes` in host machine for check after initiate cluster!
 
-![img](./img/2.png)
+![img](./img/3.png)
 
 ### Scale out worker node
-You initialize cluster. But let's say that you want to add new worker node in cluster. You don't need to terminate and re initialize cluster. Just add worker node information in [worker node config](./nodes/worker/config.json) 
+
+You initialize cluster. But let's say that you want to add new worker node in cluster. You don't need to terminate and re initialize cluster. Just add worker node information in [worker node config](./nodes/worker/config.json)
 
 ```
 {
@@ -143,11 +169,16 @@ You initialize cluster. But let's say that you want to add new worker node in cl
   ...,
 }
 ```
+
 and use command under below
+
 ```
 python3 cluster.py -c add -n <new-node-name>
 ```
-***
+
+---
+
 ## TODO List
+
 - [ ] Polymorphism Support about helm chart
 - [ ] Apply dashboard

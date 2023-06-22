@@ -58,3 +58,9 @@ class InvalidConfigType(Exception):
     def __init__(self, tp):
         super().__init__(
             f"Invalid config type detected. Should be type '{tp}'")
+        
+class InvalidNodeName(Exception):
+    def __init__(self,name):
+        super().__init__(
+            f"Invalid node name '{name}'. Should satisfy regular expression : ^[A-Za-z0-9][A-Za-z0-9-]*$"
+        )

@@ -5,7 +5,7 @@
         "disk": "20G",
         "ip": ""
     },
-    "worker node 2": {
+    "worker-node-2": {
         "cpu": "1",
         "memory": "2048M",
         "disk": "20G",

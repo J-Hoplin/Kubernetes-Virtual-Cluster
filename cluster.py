@@ -43,4 +43,4 @@ try:
     else:
         raise exceptions.WrongArgumentGiven()
 except Exception as e:
-    print(str(e))
+    print(e)

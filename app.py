@@ -96,15 +96,25 @@ class Resolver(Utility):
 
         if (not masterNodeIP) or (not masterNodeToken):
             raise exceptions.ImproperMasterNodeGenerated()
-
+        print("\n")
+        print(self.getSpecialMessage(f"[[ Master node config values ]]"))
         print(self.getSpecialMessage(f"Master Node IP : {masterNodeIP}"))
-        print(self.getSpecialMessage(f"Master Node Token : {masterNodeToken}"))
+        print(self.getSpecialMessage(f"Master Node Token : {masterNodeToken}\n"))
         print(self.getNormalMessage("Complete to build master node ..."))
 
+        print("\n")
         # Initialize worker node config
-        for i, j in workerConfig.items():
-            workerNodeName: str = self.getNodeName(i)
+        nodeCount = len(workerConfig)
+        failedNodeCount = 0
 
+        for index, items in enumerate(workerConfig.items()):
+            i,j = items
+            if not self.validateNodeName(i):
+                print(self.getCriticalMessage(f"Fail to generate node - Illegal node name config : {i}"))
+                failedNodeCount += 1
+                continue
+            workerNodeName: str = i
+            print(self.getNormalMessage(f"[[ Initializing Node : {i} ({index + 1}/{nodeCount}) ]]"))
             if not self.checkInstanceNameNotInUse(workerNodeName):
                 print(self.getCriticalMessage(f"Instance with name '{workerNodeName}' already in use! Ignore generating worker-node config '{i}'"))
                 continue
@@ -141,6 +151,13 @@ class Resolver(Utility):
             print(self.getSpecialMessage(f"Saving previous kubectl config file as {Assets.KUBE_CONFIG_DIR}/config_cp ..."))
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/getKubeConfig.sh",
                        masterNodeName, masterNodeIP, Assets.KUBE_CONFIG])
+        
+        print(f"""\n
+{self.getNormalMessage(f"Success - {nodeCount - failedNodeCount}/{nodeCount}")}
+{self.getCriticalMessage(f"Failed - {failedNodeCount}/{nodeCount}")}
+        """)
+
+
         print(self.getSpecialMessage(f"🚀 Cluster ready!"))
 
     def terminate_cluster(self):
@@ -154,7 +171,9 @@ class Resolver(Utility):
         instanceList = list(workerConfig.keys())
         instanceList.append(Assets.MASTER_NODE_KEY)
         for i in instanceList:
-            i = self.getNodeName(i)
+            if not self.validateNodeName(i):
+                print(self.getCriticalMessage(f"Illegal node name config : {i}. Ignore this node from terminate process."))
+                continue
             print(self.getNormalMessage(f"Terminating node : {i}"))
             subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/terminateCluster.sh", i])
 
