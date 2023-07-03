@@ -1,4 +1,5 @@
 import argparse
+import os
 import dotenv
 from app import Resolver
 from exception import exceptions
@@ -25,13 +26,13 @@ argList = parser.parse_args()
 
 try:
     if argList.cluster == "init":
-        resolver.cluster_init()
+        resolver.cluster_init(os.environ["K3S_VERSION"])
     elif argList.cluster == "terminate":
         resolver.terminate_cluster()
     elif argList.cluster == "add":
         if not argList.name:
             raise exceptions.RequiredCommandLineOptionLost('-n')
-        resolver.add_node(argList.name)
+        resolver.add_node(argList.name, os.environ["K3S_VERSION"])
     elif argList.cluster == "shell":
         if not argList.name:
             raise exceptions.RequiredCommandLineOptionLost('-n')

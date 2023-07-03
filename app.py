@@ -25,17 +25,17 @@ class Resolver(Utility):
     def __init__(self):
         pass
 
-    def cluster_init(self):
+    def cluster_init(self, version):
         os.system('clear')
 
         def NodeInit(name, cpu, memory, disk, tp, *args):
             if tp == NodeType.MASTER:
                 subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/nodeInit.sh", name,
-                               cpu, memory, disk, tp], stdout=subprocess.PIPE)
+                               cpu, memory, disk, tp, version], stdout=subprocess.PIPE)
             elif tp == NodeType.WORKER:
                 token, ip = args
                 subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/nodeInit.sh", name, cpu,
-                               memory, disk, tp, token, ip], stdout=subprocess.PIPE)
+                               memory, disk, tp, token, ip, version], stdout=subprocess.PIPE)
             else:
                 raise exceptions.IllegalControlException("Invalid node type")
 
@@ -207,7 +207,7 @@ class Resolver(Utility):
         print(self.getNormalMessage("Complete to terminate cluster!"))
 
     @InstanceNameAlreadyTakenChecker()
-    def add_node(self, name, **kwargs):
+    def add_node(self, name, version, **kwargs):
         masterConfig: dict = self.readConfig(Assets.MASTER_CONFIG)
         # Get worker node config
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
@@ -236,7 +236,7 @@ class Resolver(Utility):
         print(self.getNormalMessage(
             f"Initiating worker node : {workerNodeName} ..."))
         subprocess.run(["bash", f"{Assets.SCRIPT_PATH}/nodeInit.sh", workerNodeName, workerNodeCPU,
-                       workerNodeMemory, workerNodeStorage, NodeType.WORKER, token, ip], stdout=subprocess.PIPE)
+                       workerNodeMemory, workerNodeStorage, NodeType.WORKER, token, ip, version], stdout=subprocess.PIPE)
         print(self.getNormalMessage(
             f"Complete to build worker node : {workerNodeName} ..."))
         workerConfig[name]["ip"] = subprocess.run(
