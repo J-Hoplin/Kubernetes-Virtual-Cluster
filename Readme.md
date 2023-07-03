@@ -58,6 +58,16 @@ cd K3S-Virtual-Cluster
 pip3 install -r requirements.txt
 ```
 
+3. Make your K3S Version of dotenv file. Default is `v1.26.6+k3s1`. Find available version [here](https://github.com/k3s-io/k3s/releases)
+
+```
+...
+
+K3S_VERSION=v1.26.6+k3s1
+
+...
+```
+
 ---
 
 ## Commands
