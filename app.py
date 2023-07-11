@@ -207,7 +207,8 @@ class Resolver(Utility):
         print(self.getNormalMessage("Complete to terminate cluster!"))
 
     @InstanceNameAlreadyTakenChecker()
-    def add_node(self, name, version, **kwargs):
+    def add_node(self, name, *args, **kwargs):
+        version = args[0][0]
         masterConfig: dict = self.readConfig(Assets.MASTER_CONFIG)
         # Get worker node config
         workerConfig: dict = self.readConfig(Assets.WORKER_CONFIG)
