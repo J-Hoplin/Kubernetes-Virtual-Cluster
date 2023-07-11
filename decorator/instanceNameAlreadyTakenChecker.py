@@ -13,6 +13,6 @@ class InstanceNameAlreadyTakenChecker(Utility):
                 raise exceptions.InvalidNodeGenerationDetected(
                     self.getCriticalMessage(
                         f"Name with '{name}' already in use! Ignore generating worker-node config '{name}'"))
-            result = fn(instance, name, node_name=name)
+            result = fn(instance, name, args, node_name=name)
             return result
         return wrapper
