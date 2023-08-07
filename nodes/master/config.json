@@ -1,9 +1,0 @@
-{
-    "master-node": {
-        "cpu": "2",
-        "memory": "2048M",
-        "disk": "20G",
-        "ip": "",
-        "token": ""
-    }
-}
