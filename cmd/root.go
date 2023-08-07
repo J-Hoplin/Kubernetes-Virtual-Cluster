@@ -4,31 +4,34 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+	cmd "virtual-cluster/cmd/cluster"
+	"virtual-cluster/utility"
+
+	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "virtual-cluster",
-	Short: "Making a virtual Kubernetes Cluster",
-	Long: `Making a virtual Kubernetes Cluster. 
-Basically it build cluster based on multipass and K3S`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(cfgFile)
-	},
-}
+var (
+	cfgFile string
+	RootCmd = &cobra.Command{
+		Use:   "vc",
+		Short: "Making a virtual Kubernetes Cluster",
+		Long: utility.InfoMessageString(`Making a virtual Kubernetes Cluster. 
+It build cluster based on multipass and K3S`),
+		Run: func(cmd *cobra.Command, args []string) {
+			os.Exit(0)
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Help()
+			return nil
+		},
+	}
+)
 
 func init() {
-
+	RootCmd.AddCommand(cmd.ClusterCmd)
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+	RootCmd.Execute()
 }
