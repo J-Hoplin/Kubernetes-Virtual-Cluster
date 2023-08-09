@@ -3,6 +3,7 @@ package utility
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -67,4 +68,12 @@ func CheckMultipassInstanceIsClusterInstance(name string) bool {
 	_, masterCheck := masters[name]
 	_, workerCheck := workers[name]
 	return masterCheck || workerCheck
+}
+
+func CheckFileOrDirectoryExist(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	} else {
+		return true
+	}
 }

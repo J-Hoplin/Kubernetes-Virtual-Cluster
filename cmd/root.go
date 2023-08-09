@@ -30,6 +30,15 @@ It build cluster based on multipass and K3S`),
 
 func init() {
 	RootCmd.AddCommand(cmd.ClusterCmd)
+	/**
+	Check required directory exist
+	*/
+	for _, v := range []string{utility.NODE_CONFIG_PATH, utility.SCRIPTS_PATH} {
+		if x := utility.CheckFileOrDirectoryExist(v); !x {
+			utility.CriticalMessage("Required directory not found : ", v)
+			os.Exit(1)
+		}
+	}
 }
 
 func Execute() {
