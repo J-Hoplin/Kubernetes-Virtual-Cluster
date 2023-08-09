@@ -61,13 +61,18 @@ func CheckNodeNameExist(name string) bool {
 	return false
 }
 
-func CheckMultipassInstanceIsClusterInstance(name string) bool {
+func CheckIsClusterInstance(name string) bool {
 	masters, _ := GetMasterConfig()
-	workers, _ := GetWorkerConfig()
 	// Able to check key exist with second return value
 	_, masterCheck := masters[name]
-	_, workerCheck := workers[name]
+	workerCheck := CheckIsWorkerInstance(name)
 	return masterCheck || workerCheck
+}
+
+func CheckIsWorkerInstance(name string) bool {
+	workers, _ := GetWorkerConfig()
+	_, workerCheck := workers[name]
+	return workerCheck
 }
 
 func CheckFileOrDirectoryExist(path string) bool {

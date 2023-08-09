@@ -36,16 +36,19 @@ type MasterJson map[string]*MasterConfig
 type ClusterNode interface {
 	SyncIP(name string) (string, error)
 	Terminate(name string, end chan string)
+	CheckResourceAndReturnDefaultValue()
 }
 
 func (m *MasterConfig) Init(name string) error {
 	if nameValidate := NodeNameValidater(name); !nameValidate {
 		return errors.New("Node naming convention violated : " + name)
 	}
+	// Instance Check
 	if exit := CheckNodeNameExist(name); exit {
 		return errors.New("Node name '" + name + "' already running")
 	}
-
+	// Resource check and change to default value
+	m.CheckResourceAndReturnDefaultValue()
 	if version, err := GetK3SVersion(); err != nil {
 		return err
 	} else {
@@ -84,15 +87,30 @@ func (m *MasterConfig) SyncToken(name string) (string, error) {
 	}
 }
 
+func (m *MasterConfig) CheckResourceAndReturnDefaultValue() {
+	if m.Cpu == "" {
+		m.Cpu = os.Getenv("MASTER_DEFAULT_CPU")
+	}
+	if m.Disk == "" {
+		m.Cpu = os.Getenv("MASTER_DEFAULT_MEMORY")
+	}
+	if m.Disk == "" {
+		m.Disk = os.Getenv("MASTER_DEFAULT_STORAGE")
+	}
+}
+
 func (w *WorkerConfig) Init(name string, masterIp string, masterToken string, wg *sync.WaitGroup, res chan *NodeInitResult) {
 	var result *NodeInitResult
-	InfoMessage("📡 Start initializing worker node : ", name)
+	InfoMessage("🚀 Start initializing worker node : ", name)
 	if nameValidate := NodeNameValidater(name); !nameValidate {
 		result = &NodeInitResult{false, name, "Node naming convention violated : " + name}
 	} else {
 		if version, err := GetK3SVersion(); err != nil {
 			result = &NodeInitResult{false, name, err.Error()}
 		} else {
+			// Check resource config and change to default value
+			w.CheckResourceAndReturnDefaultValue()
+
 			cmd := GetCommandWithoutShown(SCRIPTS_PATH+"/nodeInit.sh", name, w.Cpu, w.Memory, w.Disk, WORKER_NODE, masterToken, masterIp, version)
 			if initErr := cmd.Run(); initErr != nil {
 				result = &NodeInitResult{false, name, initErr.Error()}
@@ -121,6 +139,26 @@ func (w *WorkerConfig) SyncIP(name string) (string, error) {
 	} else {
 		w.Ip = strings.Trim(string(result), "\n")
 		return w.Ip, err
+	}
+}
+
+func (w *WorkerConfig) Add(name string, masterIp string, masterToken string) (err error) {
+	InfoMessage("🚀 Initializing node - ", name)
+	w.CheckResourceAndReturnDefaultValue()
+	err = GetCommandWithoutShown(SCRIPTS_PATH+"/nodeInit.sh", name, w.Cpu, w.Memory, w.Disk, WORKER_NODE, masterToken, masterIp).Run()
+	_, _ = w.SyncIP(name)
+	return
+}
+
+func (m *WorkerConfig) CheckResourceAndReturnDefaultValue() {
+	if m.Cpu == "" {
+		m.Cpu = os.Getenv("WORKER_DEFAULT_CPU")
+	}
+	if m.Memory == "" {
+		m.Memory = os.Getenv("WORKER_DEFAULT_MEMORY")
+	}
+	if m.Disk == "" {
+		m.Disk = os.Getenv("WORKER_DEFAULT_STORAGE")
 	}
 }
 

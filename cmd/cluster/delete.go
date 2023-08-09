@@ -4,8 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
+	"errors"
 	"github.com/spf13/cobra"
 )
 
@@ -14,8 +13,11 @@ var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete specific node from cluster",
 	Long:  `Delete specific node from cluster`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("cluster/delete called")
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		if len(args) > 0 {
+			err = errors.New("Unnecessary arguments found")
+			return
+		}
 	},
 }
 

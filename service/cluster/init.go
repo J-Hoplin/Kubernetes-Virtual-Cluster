@@ -24,10 +24,10 @@ func InitializeCluster() error {
 	if _, ok := masterConfig[utility.MASTER_NODE_KEY]; !ok {
 		return errors.New("Master node config not found. Key should be " + utility.MASTER_NODE_KEY)
 	}
-	utility.InfoMessage("Complete to load master/worker nodes config!")
+	utility.InfoMessage("📦 Complete to load master/worker nodes config!")
 
 	// Master Node
-	utility.InfoMessage("Initializing master node...")
+	utility.InfoMessage("📦 Initializing master node...")
 	masterNode := masterConfig[utility.MASTER_NODE_KEY]
 	if masterNodeErr := masterNode.Init(utility.MASTER_NODE_KEY); masterNodeErr != nil {
 		return masterNodeErr
@@ -65,7 +65,7 @@ func InitializeCluster() error {
 	wg.Wait()
 
 	fmt.Println()
-	utility.InfoMessage("Generating kubeconfig file as - ", utility.KUBE_CONFIG)
+	utility.InfoMessage("🏷️ Generating kubeconfig file as - ", utility.KUBE_CONFIG)
 	/**
 	If directory not exist, make directory
 	*/
@@ -73,25 +73,25 @@ func InitializeCluster() error {
 		// Mkdir의 두번째 매개변수에는 디렉토리의 권한이 들어가게 된다.
 		_ = os.Mkdir(utility.KUBE_CONFIG_DIR, 0755)
 	}
-	if exist := utility.CheckFileOrDirectoryExist(utility.KUBE_CONFIG); !exist {
+	if exist := utility.CheckFileOrDirectoryExist(utility.KUBE_CONFIG); exist {
 		_ = os.Rename(utility.KUBE_CONFIG, utility.KUBE_CONFIG_DIR+"/config_cp")
-		utility.SpecialMessage("kubeconfig file exist before will be save as - ", utility.KUBE_CONFIG_DIR+"/config_cp")
+		utility.SpecialMessage("🏷️ kubeconfig file exist before will be save as - ", utility.KUBE_CONFIG_DIR+"/config_cp")
 	}
 	if cmd := utility.GetCommandWithoutShown(utility.SCRIPTS_PATH+"/getKubeConfig.sh", utility.MASTER_NODE_KEY, masterIp, utility.KUBE_CONFIG).Run(); cmd != nil {
-		utility.CriticalMessage("Fail to generate kubeconfig file. Please generate local kubeconfig manually. - ", cmd.Error())
+		utility.CriticalMessage("😓 Fail to generate kubeconfig file. Please generate local kubeconfig manually. - ", cmd.Error())
 	}
-	utility.InfoMessage("kubeconfig file generated")
+	utility.InfoMessage("🏷️ kubeconfig file generated")
 
 	/**
 	Sync config file
 	*/
 	if err := utility.SyncConfigFile(masterConfig, utility.MASTER_CONFIG); err != nil {
-		utility.CriticalMessage("Fail to synchronize master node config - ", err.Error())
+		utility.CriticalMessage("😓 Fail to synchronize master node config - ", err.Error())
 	}
 	if err := utility.SyncConfigFile(workerConfig, utility.WORKER_CONFIG); err != nil {
-		utility.CriticalMessage("Fail to synchronize worker node config - ", err.Error())
+		utility.CriticalMessage("😓 Fail to synchronize worker node config - ", err.Error())
 	}
-	utility.SpecialMessage("🚀 Cluster ready!")
+	utility.SpecialMessage("📡 Cluster ready!")
 	return nil
 }
 
@@ -105,9 +105,9 @@ func WorkerNodeListener(nodecount int, wg *sync.WaitGroup, nodeInitResCh chan *u
 			counter += 1
 			if res.Success {
 				successNodeCounter += 1
-				utility.InfoMessage("Complete to build worker node : ", res.Nodename)
+				utility.InfoMessage("✨ Complete to build worker node : ", res.Nodename)
 			} else {
-				utility.CriticalMessage("Failed to build worker node : ", res.Nodename, "(Reason : ", res.Message, ")")
+				utility.CriticalMessage("😓 Failed to build worker node : ", res.Nodename, "(Reason : ", res.Message, ")")
 			}
 			// If all of the node initialized, make an event to channel
 			if counter == nodecount {

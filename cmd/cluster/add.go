@@ -4,9 +4,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
+	"errors"
 	"github.com/spf13/cobra"
+	"virtual-cluster/service/cluster"
 )
 
 // cluster/addCmd represents the cluster/add command
@@ -14,8 +14,16 @@ var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add node to your cluster",
 	Long:  `Add node to your cluster`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("cluster/add called")
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		value, _ := cmd.Flags().GetString("name")
+
+		if len(args) > 0 {
+			err = errors.New("Unnecessary arguments found")
+			return
+		}
+
+		err = cluster.AddCluster(value)
+		return
 	},
 }
 

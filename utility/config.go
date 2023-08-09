@@ -37,7 +37,7 @@ func GetMasterWorkerConfig() (master MasterJson, worker WorkerJson, err error) {
 	worker, workerErr := GetWorkerConfig()
 
 	getMsg := func(tp string) string {
-		return CriticalMessageString("Fail to parse" + tp + "file (Invalid format)")
+		return CriticalMessageString("Fail to parse " + tp + "file (Invalid format)")
 	}
 	// Check error while get config
 	if masterErr != nil {
