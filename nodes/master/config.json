@@ -1,9 +1,9 @@
 {
-    "master-node": {
-        "cpu": "2",
-        "memory": "2048M",
-        "disk": "20G",
-        "ip": "",
-        "token": ""
-    }
+	"master-node": {
+		"cpu": "2",
+		"memory": "2048M",
+		"disk": "20G",
+		"ip": "192.168.64.191",
+		"token": "K106eb01c15bb146bd09e7c22dcbcc9971b57bdb139b050956762e123cdabeb1edb::server:ae75524b09fa49214a0d23a444e6297b"
+	}
 }
