@@ -66,6 +66,7 @@ func (m *MasterConfig) Terminate(name string, end chan string) {
 	// Clear ip, token info
 	m.Ip = ""
 	m.Token = ""
+	InfoMessage("👋 Complete to terminate node - ", name)
 	end <- name
 }
 
@@ -126,10 +127,10 @@ func (w *WorkerConfig) Init(name string, masterIp string, masterToken string, wg
 	return
 }
 
-func (m *WorkerConfig) Terminate(name string, end chan string) {
+func (w *WorkerConfig) Terminate(name string, end chan string) {
 	_ = GetCommandWithoutShown(SCRIPTS_PATH+"/terminateCluster.sh", name).Run()
 	// Clear IP
-	m.Ip = ""
+	w.Ip = ""
 	end <- name
 }
 
@@ -140,6 +141,15 @@ func (w *WorkerConfig) SyncIP(name string) (string, error) {
 		w.Ip = strings.Trim(string(result), "\n")
 		return w.Ip, err
 	}
+}
+
+func (w *WorkerConfig) Remove(name string) (err error) {
+	InfoMessage("👋 Removing node - ", name)
+	_ = GetCommandWithoutShown(SCRIPTS_PATH+"/deleteNode.sh", MASTER_NODE_KEY, name).Run()
+	_ = GetCommandWithoutShown(SCRIPTS_PATH+"/terminateCluster.sh", name).Run()
+	_ = GetCommandWithoutShown(SCRIPTS_PATH + "/purgeInstance.sh").Run()
+	w.Ip = ""
+	return
 }
 
 func (w *WorkerConfig) Add(name string, masterIp string, masterToken string) (err error) {

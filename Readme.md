@@ -9,9 +9,16 @@
 
 ---
 
-Version : 0.0.2
+Version : 0.1.0
 
 ---
+## What's new?
+
+- The base language of this project has been changed to go language.
+- There are more advantages than Python in CLI production, and open source called [cobra](https://github.com/spf13/cobra) was used for this project
+- Apply the concept of concurrency programming using goroutine to show improved performance compared to Python version
+
+I'll organize the details with the patch note ASAP
 
 ## Required Spec
 
@@ -25,7 +32,7 @@ Version : 0.0.2
   - If your environment is 8GB of RAM : 1 master, 1 worker node is recommended
   - Least : 16 GB of RAM
   - Stable : 32 GB of RAM or upper
-- Python3 : ver 3.8 upper
+- Golang : **Upper than v 1.18**
 
 ---
 
@@ -40,6 +47,8 @@ Version : 0.0.2
 - Install helm
   - https://helm.sh/docs/intro/install/
 
+**If more than one requisite is not satisfied, CLI will return error like underbelow**
+![img](./img/3.png)
 ---
 
 ## Before start
@@ -52,11 +61,19 @@ git clone https://github.com/J-hoplin1/K3S-Virtual-Cluster.git
 cd K3S-Virtual-Cluster
 ```
 
-2. Install requirements.txt
+2. Install required packages
 
 ```
-pip3 install -r requirements.txt
+go install
 ```
+
+3. Compile
+
+```
+go build
+```
+
+Will going to provide a solution that is registered in the environmental variable and used in near future ☺️
 
 3. Make your K3S Version of dotenv file. Default is `v1.26.6+k3s1`. Find available version [here](https://github.com/k3s-io/k3s/releases)
 
@@ -77,30 +94,30 @@ K3S_VERSION=v1.26.6+k3s1
   - **Due to lack of computing resources, master / worker node may not initialize properly sometimes. Please check computing resource before initiate cluster. (Usually occured in 8/16 GB RAM PC)**
 
   ```
-  python3 cluster.py -c init
+  ./virtual-cluster cluster init
   ```
 
 - Terminate cluster
 
   ```
-  python3 cluster.py -c terminate
+  ./virtual-cluster cluster terminate
   ```
 
 - Add new worker-node to cluster (Scale-Out)
   - `-n` option is required when using `-c add` option
   ```
-  python3 cluster.py -c add -n <new-node-name>
+  ./virtual-cluster cluster add -n <new-node-name>
   ```
 - Connect to node instance's shell
   - `-n` option is required when using `-c shell` option
   ```
-  python3 cluster.py -c shell -n <node-name>
+  ./virtual-cluster cluster shell -n <node-name>
   ```
 - Delete worker-node from cluster
   - **Warning : This option ignore daemonsets and delete local datas of node!**
   - `-n` option is required when using `-c delete` option
   ```
-  python3 cluster.py -c delete -n <node-name>
+  ./virtual-cluster cluster delete -n <node-name>
   ```
 
 ---
@@ -188,7 +205,3 @@ python3 cluster.py -c add -n <new-node-name>
 
 ---
 
-## TODO List
-
-- [ ] Polymorphism Support about helm chart
-- [ ] Apply dashboard

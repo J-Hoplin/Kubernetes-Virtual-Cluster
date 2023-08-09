@@ -6,22 +6,30 @@ package cmd
 import (
 	"errors"
 	"github.com/spf13/cobra"
+	"virtual-cluster/service/cluster"
 )
 
 // cluster/deleteCmd represents the cluster/delete command
-var deleteCmd = &cobra.Command{
-	Use:   "delete",
+var removeCmd = &cobra.Command{
+	Use:   "remove",
 	Short: "Delete specific node from cluster",
 	Long:  `Delete specific node from cluster`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		if len(args) > 0 {
-			err = errors.New("Unnecessary arguments found")
+		if value, flagErr := cmd.Flags().GetString("name"); flagErr != nil {
+			err = flagErr
 			return
+		} else {
+			if len(args) > 0 {
+				err = errors.New("Unnecessary arguments found")
+				return
+			}
+			err = cluster.RemoveNode(value)
 		}
+		return
 	},
 }
 
 func init() {
-	deleteCmd.Flags().StringVarP(&nodename, "name", "n", "", "Name of node you want to delete")
+	removeCmd.Flags().StringVarP(&nodename, "name", "n", "", "Name of node you want to delete")
 	addCmd.MarkFlagRequired("name")
 }

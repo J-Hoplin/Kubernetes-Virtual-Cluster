@@ -6,7 +6,6 @@ import (
 )
 
 func TerminateCluster() (err error) {
-	utility.ClearConsole()
 	masterConfig, workerConfig, err := utility.GetMasterWorkerConfig()
 	if err != nil {
 		return err
@@ -26,7 +25,7 @@ func TerminateCluster() (err error) {
 			go v.Terminate(k, endChannel)
 		} else {
 			// Do not create go routine if node not exist
-			utility.CriticalMessage("Node name with '" + k + "' is not running!")
+			utility.CriticalMessage("🫢 Node name with '" + k + "' is not running!")
 			wg.Done()
 		}
 	}
@@ -37,8 +36,8 @@ func TerminateCluster() (err error) {
 			go v.Terminate(k, endChannel)
 		} else {
 			// Do not create go routine if node not exist
-			utility.CriticalMessage("Node name with '" + k + "' is not running!")
-			wg.Done()
+			utility.CriticalMessage("🫢 Node name with '" + k + "' is not running!")
+			endChannel <- k
 		}
 	}
 	wg.Wait()
@@ -59,9 +58,8 @@ func TerminateListener(taskCount int, wg *sync.WaitGroup, end chan string, termi
 	var counter int
 	for {
 		select {
-		case node := <-end:
+		case <-end:
 			counter += 1
-			utility.InfoMessage("👋 Complete to terminate node - ", node)
 			wg.Done()
 			if counter == taskCount {
 				go func() {
@@ -69,7 +67,7 @@ func TerminateListener(taskCount int, wg *sync.WaitGroup, end chan string, termi
 				}()
 			}
 		case <-terminate:
-			utility.InfoMessage("✨ All of the node terminated! (Total ", taskCount, "nodes)")
+			utility.InfoMessage("✨ All of the node terminated!")
 			wg.Done()
 			return
 		}

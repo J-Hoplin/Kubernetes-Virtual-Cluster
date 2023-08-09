@@ -5,7 +5,11 @@ import (
 	"virtual-cluster/utility"
 )
 
-func AddCluster(name string) error {
+func AddNode(name string) error {
+	// Check name is valid convention
+	if nameValidate := utility.NodeNameValidater(name); !nameValidate {
+		return errors.New("Node naming convention violated : " + name)
+	}
 
 	// Check if multipass instance with same name is running
 	// If invalid args given, return error
@@ -23,12 +27,7 @@ func AddCluster(name string) error {
 		return errors.New(utility.CriticalMessageString("'", name, "' set not exist in worker node config file"))
 	}
 
-	// Check name is valid convention
-	if nameValidate := utility.NodeNameValidater(name); !nameValidate {
-		return errors.New("Node naming convention violated : " + name)
-	}
-
-	utility.InfoMessage("📦 Complete to load node's information - ", name)
+	utility.InfoMessage("✅ Complete to load node's information - ", name)
 	// If master node's token and ip is not an empty string
 	master := masterConfig[utility.MASTER_NODE_KEY]
 	if master.Ip == "" || master.Token == "" {

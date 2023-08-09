@@ -23,6 +23,7 @@ func main() {
 	Load dotenv
 	*/
 	envErr := godotenv.Load()
+
 	if envErr != nil {
 		utility.CriticalMessage("Application crushed :Fail to load .env file")
 		os.Exit(1)

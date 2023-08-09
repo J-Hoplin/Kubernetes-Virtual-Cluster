@@ -15,14 +15,16 @@ var addCmd = &cobra.Command{
 	Short: "Add node to your cluster",
 	Long:  `Add node to your cluster`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		value, _ := cmd.Flags().GetString("name")
-
-		if len(args) > 0 {
-			err = errors.New("Unnecessary arguments found")
+		if value, flagErr := cmd.Flags().GetString("name"); flagErr != nil {
+			err = flagErr
 			return
+		} else {
+			if len(args) > 0 {
+				err = errors.New("Unnecessary arguments found")
+				return
+			}
+			err = cluster.AddNode(value)
 		}
-
-		err = cluster.AddCluster(value)
 		return
 	},
 }

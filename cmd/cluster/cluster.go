@@ -13,7 +13,7 @@ var nodename string
 var ClusterCmd = &cobra.Command{
 	Use:   "cluster",
 	Short: "Control your cluster",
-	Long: `You can initialize your cluster 
+	Long: `Initialize your own multi-node cluster in your PC! 
 add node to your cluster, remove node from your cluster and terminate cluster
 
 Usage : vc cluster [command] [flag]
@@ -25,7 +25,7 @@ Usage : vc cluster [command] [flag]
 
 func init() {
 	ClusterCmd.AddCommand(addCmd)
-	ClusterCmd.AddCommand(deleteCmd)
+	ClusterCmd.AddCommand(removeCmd)
 	ClusterCmd.AddCommand(shellCmd)
 	ClusterCmd.AddCommand(initCmd)
 	ClusterCmd.AddCommand(terminateCmd)

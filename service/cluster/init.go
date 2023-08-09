@@ -24,10 +24,10 @@ func InitializeCluster() error {
 	if _, ok := masterConfig[utility.MASTER_NODE_KEY]; !ok {
 		return errors.New("Master node config not found. Key should be " + utility.MASTER_NODE_KEY)
 	}
-	utility.InfoMessage("📦 Complete to load master/worker nodes config!")
+	utility.InfoMessage("✅ Complete to load master/worker nodes config!")
 
 	// Master Node
-	utility.InfoMessage("📦 Initializing master node...")
+	utility.InfoMessage("🚀 Start initializing master node...")
 	masterNode := masterConfig[utility.MASTER_NODE_KEY]
 	if masterNodeErr := masterNode.Init(utility.MASTER_NODE_KEY); masterNodeErr != nil {
 		return masterNodeErr
@@ -65,7 +65,7 @@ func InitializeCluster() error {
 	wg.Wait()
 
 	fmt.Println()
-	utility.InfoMessage("🏷️ Generating kubeconfig file as - ", utility.KUBE_CONFIG)
+	utility.InfoMessage("🏷️  Generating kubeconfig file as - ", utility.KUBE_CONFIG)
 	/**
 	If directory not exist, make directory
 	*/
@@ -75,7 +75,7 @@ func InitializeCluster() error {
 	}
 	if exist := utility.CheckFileOrDirectoryExist(utility.KUBE_CONFIG); exist {
 		_ = os.Rename(utility.KUBE_CONFIG, utility.KUBE_CONFIG_DIR+"/config_cp")
-		utility.SpecialMessage("🏷️ kubeconfig file exist before will be save as - ", utility.KUBE_CONFIG_DIR+"/config_cp")
+		utility.SpecialMessage("🏷️  kubeconfig file exist before will be save as - ", utility.KUBE_CONFIG_DIR+"/config_cp")
 	}
 	if cmd := utility.GetCommandWithoutShown(utility.SCRIPTS_PATH+"/getKubeConfig.sh", utility.MASTER_NODE_KEY, masterIp, utility.KUBE_CONFIG).Run(); cmd != nil {
 		utility.CriticalMessage("😓 Fail to generate kubeconfig file. Please generate local kubeconfig manually. - ", cmd.Error())
