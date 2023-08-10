@@ -80,7 +80,7 @@ func InitializeCluster() error {
 	if cmd := utility.GetCommandWithoutShown(utility.SCRIPTS_PATH+"/getKubeConfig.sh", utility.MASTER_NODE_KEY, masterIp, utility.KUBE_CONFIG).Run(); cmd != nil {
 		utility.CriticalMessage("😓 Fail to generate kubeconfig file. Please generate local kubeconfig manually. - ", cmd.Error())
 	}
-	utility.InfoMessage("🏷️ kubeconfig file generated")
+	utility.InfoMessage("🏷️  kubeconfig file generated")
 
 	/**
 	Sync config file

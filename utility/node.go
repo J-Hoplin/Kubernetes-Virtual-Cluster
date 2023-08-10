@@ -131,6 +131,7 @@ func (w *WorkerConfig) Terminate(name string, end chan string) {
 	_ = GetCommandWithoutShown(SCRIPTS_PATH+"/terminateCluster.sh", name).Run()
 	// Clear IP
 	w.Ip = ""
+	InfoMessage("👋 Complete to terminate node - ", name)
 	end <- name
 }
 
