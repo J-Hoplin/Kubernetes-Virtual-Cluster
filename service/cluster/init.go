@@ -51,20 +51,22 @@ func InitializeCluster() error {
 	utility.SpecialMessage("📝 Master Node Token : ", masterToken)
 	utility.InfoMessage("✨ Complete to build Master node")
 	fmt.Println()
-	// Go routine
-	wg := sync.WaitGroup{}
-	nodeInitResCh := make(chan *utility.NodeInitResult)
-	terminate := make(chan bool)
-	// Add wait grouo -> '+1' about listener
-	wg.Add(len(workerConfig) + 1)
 
-	go WorkerNodeListener(len(workerConfig), &wg, nodeInitResCh, terminate)
-	for k, v := range workerConfig {
-		go v.Init(k, masterIp, masterToken, &wg, nodeInitResCh)
+	// If worker config exist
+	if(len(workerConfig) != 0){
+		// Start Go routine
+		wg := sync.WaitGroup{}
+		nodeInitResCh := make(chan *utility.NodeInitResult)
+		terminate := make(chan bool)
+		wg.Add(len(workerConfig) + 1)
+		go WorkerNodeListener(len(workerConfig), &wg, nodeInitResCh, terminate)
+		for k, v := range workerConfig {
+			go v.Init(k, masterIp, masterToken, &wg, nodeInitResCh)
+		}
+		wg.Wait()
+		fmt.Println()
 	}
-	wg.Wait()
-
-	fmt.Println()
+	
 	utility.InfoMessage("🏷️  Generating kubeconfig file as - ", utility.KUBE_CONFIG)
 	/**
 	If directory not exist, make directory
