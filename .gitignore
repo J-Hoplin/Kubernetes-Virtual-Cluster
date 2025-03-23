@@ -9,3 +9,5 @@ test.py
 **/*.db
 cluster-config.json
 **/*.sqlite
+
+.DS_Store
