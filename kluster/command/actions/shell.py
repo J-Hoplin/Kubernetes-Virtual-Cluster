@@ -1,8 +1,8 @@
 import os
 import sqlite3
 import subprocess
-from cluster.utils import logger
-from cluster.constant import SQLITE_PATH
+from kluster.utils import logger
+from kluster.constant import SQLITE_PATH
 
 
 def check_node_exists(node_name, cursor):

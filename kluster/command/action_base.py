@@ -1,8 +1,11 @@
 import argparse
-from cluster.command.actions import init, destroy, shell
+from kluster.command.actions import init, destroy, shell, doctor
+from kluster.utils.dependency import check_dependencies
 
 
 def action_parser(parser: argparse.ArgumentParser):
+    check_dependencies()
+
     action_parser = parser.add_subparsers(
         title="Cluster action command", dest="action", help="Cluster of action"
     )
@@ -36,3 +39,7 @@ def action_parser(parser: argparse.ArgumentParser):
     shell_parser = action_parser.add_parser("shell", help="Access shell of a node")
     shell_parser.add_argument("node", help="Node name to access")
     shell_parser.set_defaults(func=shell.run)
+
+    # Configuration for sub command - doctor
+    doctor_parser = action_parser.add_parser("doctor", help="Check dependencies")
+    doctor_parser.set_defaults(func=doctor.run)

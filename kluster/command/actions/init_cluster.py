@@ -2,7 +2,7 @@ import subprocess
 import time
 import random
 import string
-from cluster.utils import logger
+from kluster.utils import logger
 
 
 def setup_single_master_cluster(connection, cursor, master_nodes, worker_nodes):
@@ -29,7 +29,7 @@ def setup_single_master_cluster(connection, cursor, master_nodes, worker_nodes):
 
 
 def setup_ha_master_cluster(connection, cursor, master_nodes, worker_nodes):
-    logger.log("🔄 Mode: Multi-master node cluster")
+    logger.log("🔄 Mode: High availability cluster")
 
     master_names = list(master_nodes.keys())
     first_master = master_names[0]

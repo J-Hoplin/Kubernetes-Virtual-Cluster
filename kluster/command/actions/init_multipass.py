@@ -1,7 +1,7 @@
 import sys
 import subprocess
 import json
-from cluster.utils import logger
+from kluster.utils import logger
 
 
 def check_and_download_image(ubuntu_version):

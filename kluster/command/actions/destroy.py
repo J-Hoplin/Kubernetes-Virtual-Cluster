@@ -1,9 +1,9 @@
 import os
 import sqlite3
-from cluster.utils import logger
-from cluster.constant import SQLITE_PATH
-from cluster.command.actions.destroy_kubeconfig import cleanup_kubeconfig
-from cluster.command.actions.destroy_multipass import destroy_node, purge_multipass
+from kluster.utils import logger
+from kluster.constant import SQLITE_PATH
+from kluster.command.actions.destroy_kubeconfig import cleanup_kubeconfig
+from kluster.command.actions.destroy_multipass import destroy_node, purge_multipass
 
 
 def run(args):
@@ -26,7 +26,9 @@ def run(args):
             master_nodes = sum(1 for _, node_type in nodes if node_type == "master")
             worker_nodes = total_nodes - master_nodes
 
-            logger.log(f"👀 Found: {total_nodes} nodes ({master_nodes} masters, {worker_nodes} workers)")
+            logger.log(
+                f"👀 Found: {total_nodes} nodes ({master_nodes} masters, {worker_nodes} workers)"
+            )
 
             if not args.force:
                 confirmation = input("⚠️ Do you want to delete the cluster? (Y/N): ")
@@ -35,16 +37,22 @@ def run(args):
                     return 0
 
             for node_name, node_type in nodes:
-                logger.log(f"🔄 Deleting {node_type} node: {node_name}")
+                logger.log(
+                    f"🔄 Deleting {node_type} node: {node_name}", context="Multipass"
+                )
                 if destroy_node(node_name):
-                    logger.log(f"✅ Node {node_name} destroyed")
+                    logger.log(f"✅ Node {node_name} destroyed", context="Multipass")
                 else:
-                    logger.warn(f"❌ Failed to destroy node {node_name}")
+                    logger.warn(
+                        f"❌ Failed to destroy node {node_name}", context="Multipass"
+                    )
 
             if purge_multipass():
-                logger.log("✅ Purged all destroyed instances")
+                logger.log("✅ Purged all destroyed instances", context="Multipass")
             else:
-                logger.warn("❌ Failed to purge destroyed instances")
+                logger.warn(
+                    "❌ Failed to purge destroyed instances", context="Multipass"
+                )
 
             if cleanup_kubeconfig(nodes):
                 logger.log("✅ Cleaned up kubeconfig")
@@ -56,8 +64,8 @@ def run(args):
             logger.log("✅ Cleaned up cluster state database")
             return 0
 
-    except sqlite3.Error as e:
-        logger.error(f"❌ Database error: {e}")
+    except sqlite3.Error:
+        logger.error("❌ Cluster states is empty")
         return 1
     except Exception as e:
         logger.error(f"❌ Programmatic error: {e}")

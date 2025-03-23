@@ -3,10 +3,13 @@ import json
 import sqlite3
 import re
 import subprocess
-from cluster.constant import CLUSTER_PATH, SQLITE_PATH
-from cluster.command.actions.init_cluster import  setup_single_master_cluster,setup_ha_master_cluster
-from cluster.command.actions.init_multipass import check_and_download_image, create_vms
-from cluster.utils import logger
+from kluster.constant import CLUSTER_PATH, SQLITE_PATH
+from kluster.command.actions.init_cluster import (
+    setup_single_master_cluster,
+    setup_ha_master_cluster,
+)
+from kluster.command.actions.init_multipass import check_and_download_image, create_vms
+from kluster.utils import logger
 
 
 def config_deserializer(config_path):

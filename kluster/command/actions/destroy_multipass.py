@@ -1,5 +1,6 @@
 import subprocess
-from cluster.utils import logger
+from kluster.utils import logger
+
 
 def destroy_node(node_name):
     try:

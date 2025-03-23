@@ -2,14 +2,13 @@
 
 import sys
 import argparse
-from cluster.command.action_base import action_parser
+from kluster.command.action_base import action_parser
 
 version = "2.0.0"
 
 
 def parser_bootstrap():
-    parser = argparse.ArgumentParser(description="Cluster base command", prog="cluster")
-
+    parser = argparse.ArgumentParser(description="Cluster base command", prog="kluster")
     parser.add_argument("--version", "-v", action="version", version=version)
     action_parser(parser)
     return parser
