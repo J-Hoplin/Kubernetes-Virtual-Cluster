@@ -4,18 +4,14 @@ import sqlite3
 import re
 import subprocess
 from cluster.constant import CLUSTER_PATH, SQLITE_PATH
-from cluster.command.actions.init_initialize_cluster import create_vms
-from cluster.command.actions.init_setup_cluster import (
-    setup_single_master_cluster,
-    setup_ha_master_cluster,
-)
-from cluster.command.actions.init_multipass import check_and_download_image
+from cluster.command.actions.init_cluster import  setup_single_master_cluster,setup_ha_master_cluster
+from cluster.command.actions.init_multipass import check_and_download_image, create_vms
 from cluster.utils import logger
 
 
 def config_deserializer(config_path):
     if not os.path.exists(config_path):
-        print(f"Config file does not exist: {config_path}")
+        logger.error(f"❌ Config file does not exist: {config_path}")
         return None
 
     try:
@@ -23,7 +19,7 @@ def config_deserializer(config_path):
             config = json.load(f)
         return config
     except json.JSONDecodeError as e:
-        print(f"JSON format error: {e.msg}")
+        logger.error(f"❌ JSON format error: {e.msg}")
         return None
 
 
@@ -52,16 +48,16 @@ def check_existing_cluster(db_path, force=False):
                 """
                 if count > 0:
                     if not force:
-                        print(f"Warning: {count} nodes are already registered.")
+                        logger.warn(f"Warning: {count} nodes are already registered.")
                         confirmation = input(
-                            "Do you want to delete existing cluster state and reinitialize? (y/N): "
+                            "⚠️ Do you want to delete existing cluster state and reinitialize? (Y/N): "
                         )
                         if confirmation.lower() != "y":
-                            print("Unable to proceed with existing cluster data.")
+                            logger.warn("Unable to proceed with existing cluster data.")
                             return False
         return True
     except sqlite3.Error as e:
-        print(f"Error while checking database: {e}")
+        logger.error(f"Error while checking database: {e}")
         return False
 
 
