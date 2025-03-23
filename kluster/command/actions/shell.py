@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 from kluster.utils import logger
 from kluster.constant import SQLITE_PATH
+from kluster.utils.dependency import require_dependencies
 
 
 def check_node_exists(node_name, cursor):
@@ -11,6 +12,7 @@ def check_node_exists(node_name, cursor):
     return result[0] if result else None
 
 
+@require_dependencies()
 def run(args):
     if not os.path.exists(SQLITE_PATH):
         logger.error("No cluster state found")

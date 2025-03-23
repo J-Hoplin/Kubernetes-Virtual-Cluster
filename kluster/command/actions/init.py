@@ -9,6 +9,8 @@ from kluster.command.actions.init_cluster import (
     setup_ha_master_cluster,
 )
 from kluster.command.actions.init_multipass import check_and_download_image, create_vms
+from kluster.command.actions.destroy import run as destroy_run
+from kluster.utils.dependency import require_dependencies
 from kluster.utils import logger
 
 
@@ -44,13 +46,16 @@ def check_existing_cluster(db_path, force=False):
             if cursor.fetchone():
                 cursor.execute("SELECT COUNT(*) FROM nodes")
                 count = cursor.fetchone()[0]
-                """
-                만약 기존에 관리하고 있던 cluster가 있는 경우
-                Y: State 밀고 초기화, 단 이후 Manage 상태는 책임지지 않음
-                N 혹은 다른거: 초기화 x
-                """
+
                 if count > 0:
-                    if not force:
+                    if force:
+                        logger.warn(
+                            "⚠️Existing cluster state cleared due to force option"
+                        )
+                        args = type("Args", (), {"force": True})()
+                        destroy_run(args)
+                        return True
+                    else:
                         logger.warn(f"Warning: {count} nodes are already registered.")
                         confirmation = input(
                             "⚠️ Do you want to delete existing cluster state and reinitialize? (Y/N): "
@@ -58,6 +63,9 @@ def check_existing_cluster(db_path, force=False):
                         if confirmation.lower() != "y":
                             logger.warn("Unable to proceed with existing cluster data.")
                             return False
+                        args = type("Args", (), {"force": True})()
+                        destroy_run(args)
+                        return True
         return True
     except sqlite3.Error as e:
         logger.error(f"Error while checking database: {e}")
@@ -287,6 +295,7 @@ Command:
         return False
 
 
+@require_dependencies()
 def run(args):
     config_path = os.path.join(os.getcwd(), args.config)
     config = config_deserializer(config_path)

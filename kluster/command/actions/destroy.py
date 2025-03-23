@@ -4,8 +4,10 @@ from kluster.utils import logger
 from kluster.constant import SQLITE_PATH
 from kluster.command.actions.destroy_kubeconfig import cleanup_kubeconfig
 from kluster.command.actions.destroy_multipass import destroy_node, purge_multipass
+from kluster.utils.dependency import require_dependencies
 
 
+@require_dependencies()
 def run(args):
     if not os.path.exists(SQLITE_PATH):
         logger.error("No cluster state found")

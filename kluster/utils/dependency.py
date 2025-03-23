@@ -1,8 +1,22 @@
 import shutil
+import functools
 from kluster.utils import logger
 
 
-def check_dependencies(is_doctor: bool = False):
+def require_dependencies(is_doctor: bool = False):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(args):
+            if not _check_dependencies(is_doctor=is_doctor):
+                return 1
+            return func(args)
+
+        return wrapper
+
+    return decorator
+
+
+def _check_dependencies(is_doctor: bool = False):
     required_tools = {"kubectl": True, "multipass": True, "helm": False}
 
     all_installed = True

@@ -1,6 +1,6 @@
-from kluster.utils.dependency import check_dependencies
+from kluster.utils.dependency import require_dependencies
 
 
+@require_dependencies(is_doctor=True)
 def run(args):
-    check_dependencies(is_doctor=True)
     return 0

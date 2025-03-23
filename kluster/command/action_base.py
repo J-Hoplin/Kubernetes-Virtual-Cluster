@@ -1,11 +1,8 @@
 import argparse
 from kluster.command.actions import init, destroy, shell, doctor
-from kluster.utils.dependency import check_dependencies
 
 
 def action_parser(parser: argparse.ArgumentParser):
-    check_dependencies()
-
     action_parser = parser.add_subparsers(
         title="Cluster action command", dest="action", help="Cluster of action"
     )
