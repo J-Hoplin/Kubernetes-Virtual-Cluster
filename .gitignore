@@ -5,3 +5,7 @@ virtual-cluster
 .vscode
 
 test.py
+
+**/*.db
+cluster-config.json
+**/*.sqlite
