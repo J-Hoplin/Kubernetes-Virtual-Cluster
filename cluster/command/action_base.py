@@ -1,5 +1,5 @@
 import argparse
-from cluster.command.actions import init, destroy
+from cluster.command.actions import init, destroy, shell
 
 
 def action_parser(parser: argparse.ArgumentParser):
@@ -8,7 +8,7 @@ def action_parser(parser: argparse.ArgumentParser):
     )
     action_parser.required = True
 
-    # Configuration for sub command - Init
+    # Configuration for sub command - init
     init_action = action_parser.add_parser("init", help="Initialize Cluster")
     init_action.add_argument(
         "--config",
@@ -31,3 +31,8 @@ def action_parser(parser: argparse.ArgumentParser):
         "-f", "--force", help="Force deletion without confirmation", action="store_true"
     )
     destroy_parser.set_defaults(func=destroy.run)
+
+    # Configuration for sub command - shell
+    shell_parser = action_parser.add_parser("shell", help="Access shell of a node")
+    shell_parser.add_argument("node", help="Node name to access")
+    shell_parser.set_defaults(func=shell.run)
