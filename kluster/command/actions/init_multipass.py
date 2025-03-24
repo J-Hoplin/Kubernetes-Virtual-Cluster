@@ -41,7 +41,7 @@ def check_and_download_image(ubuntu_version):
         sys.exit(1)
 
 
-def create_vms(connection, cursor, master_nodes, worker_nodes):
+def create_vms(connection, cursor, master_nodes, worker_nodes,ubuntu_version):
     logger.log("Assign instance per node...", context="Multipass")
     all_nodes = {**master_nodes, **worker_nodes}
 
@@ -64,6 +64,7 @@ def create_vms(connection, cursor, master_nodes, worker_nodes):
             f"{memory}M",
             "--disk",
             f"{disk}G",
+            ubuntu_version
         ]
 
         result = subprocess.run(cmd, capture_output=True, text=True)

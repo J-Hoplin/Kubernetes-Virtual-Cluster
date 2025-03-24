@@ -381,7 +381,7 @@ def run(args):
         master_nodes, worker_nodes = get_nodes_by_type(cursor)
 
         logger.log("🚀 Initializing cluster")
-        if not create_vms(connection, cursor, master_nodes, worker_nodes):
+        if not create_vms(connection, cursor, master_nodes, worker_nodes,ubuntu_version):
             logger.error(
                 "❌Failed to create instances for the cluster", context="Multipass"
             )
