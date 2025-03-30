@@ -20,17 +20,23 @@ MacOS에서만 사용이 가능한 로컬 Kubernetes 클러스터 관리 도구�
 
 ## Commands
 
+### Installation
+
+```bash
+./setup.sh
+```
+
 ### Base Command
 
 - **도움말**: `-h`, `--help`
 
   ```bash
-  python3 kluster.py -h
+  kluster -h
   ```
 
 - **버전 확인**: `-v`, `--version`
   ```bash
-  python3 kluster.py -v
+  kluster -v
   ```
 
 ### Cluster Command
@@ -38,17 +44,17 @@ MacOS에서만 사용이 가능한 로컬 Kubernetes 클러스터 관리 도구�
 - **클러스터 초기화**: `init`
 
   ```bash
-  python3 kluster.py init [옵션]
+  kluster init [옵션]
   ```
 
   - 옵션:
-    - `--config`, `-c`: 클러스터 설정파일 경로 (기본값: `./cluster-config.json`)
+    - `--config`, `-c`: 클러스터 설정파일 경로 (기본값: `<executed-path>/cluster-config.json`)
     - `--force`, `-f`: 기존 클러스터가 있으면 삭제 후 재생성
 
 - **특정 노드 VM Shell 접속**: `shell`
 
   ```bash
-  python3 kluster.py shell --node <노드이름>
+  kluster shell --node <노드이름>
   ```
 
   - 옵션:
@@ -57,12 +63,12 @@ MacOS에서만 사용이 가능한 로컬 Kubernetes 클러스터 관리 도구�
 - **필수 의존성 검사(`multipass`,`kubectl`,`helm`)**: `doctor`
 
   ```bash
-  python3 kluster.py doctor
+  kluster doctor
   ```
 
 - **클러스터 삭제**: `destroy`
   ```bash
-  python3 kluster.py destroy [옵션]
+  kluster destroy [옵션]
   ```
   - 옵션:
     - `--force`, `-f`: 삭제 확인 생략
@@ -75,6 +81,8 @@ MacOS에서만 사용이 가능한 로컬 Kubernetes 클러스터 관리 도구�
 2. **High Availability Cluster**: Master 노드가 2개 이상인 경우
 
 ### Config file example
+
+> **⚠️ 해당 프로젝트에는 기본 클러스터 정의가 포함되어있습니다.(`cluster-config.json`) 해당 파일은 아래 설명과 관련없음을 주의해주시기 바랍니다.**
 
 ```json
 {
@@ -157,3 +165,9 @@ kubectl config use-context k3s-<master node name>
 ```
 
 `destroy` 명령어로 클러스터 삭제시 `init` 과정에서 생성된 context도 모두 삭제됩니다.
+
+## Running Example
+
+<div style="display:flex">
+  <img src="img/a.png" alt="a" width="300"/>
+</div>

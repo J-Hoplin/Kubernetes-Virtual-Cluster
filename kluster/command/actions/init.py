@@ -3,7 +3,7 @@ import json
 import sqlite3
 import re
 import subprocess
-from kluster.constant import CLUSTER_PATH, SQLITE_PATH
+from kluster.constant import CLUSTER_PATH, SQLITE_PATH, DEFAULT_CONFIG_PATH
 from kluster.command.actions.init_cluster import (
     setup_single_master_cluster,
     setup_ha_master_cluster,
@@ -297,7 +297,15 @@ Command:
 
 @require_dependencies()
 def run(args):
-    config_path = os.path.join(os.getcwd(), args.config)
+    if not os.path.isabs(args.config):
+        current_dir_config = os.path.join(os.getcwd(), args.config)
+        if os.path.exists(current_dir_config):
+            config_path = current_dir_config
+        else:
+            config_path = DEFAULT_CONFIG_PATH
+    else:
+        config_path = args.config
+
     config = config_deserializer(config_path)
     if not config:
         return 1
@@ -391,13 +399,13 @@ def run(args):
         setup_success = False
         if len(master_nodes) == 1:
             setup_success = setup_single_master_cluster(
-                connection, cursor, master_nodes, worker_nodes
+                connection, cursor, master_nodes, worker_nodes, kubernetes_version
             )
             if not setup_success:
                 logger.error("❌Failed to setup single master cluster")
         else:
             setup_success = setup_ha_master_cluster(
-                connection, cursor, master_nodes, worker_nodes
+                connection, cursor, master_nodes, worker_nodes, kubernetes_version
             )
             if not setup_success:
                 logger.error("❌Failed to setup HA master cluster")
