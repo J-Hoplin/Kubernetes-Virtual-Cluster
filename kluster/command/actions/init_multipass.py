@@ -75,6 +75,14 @@ def create_vms(connection, cursor, master_nodes, worker_nodes,ubuntu_version):
             )
             return False
 
+        ufw_cmd = ["multipass", "exec", node_name, "--", "sudo", "ufw", "disable"]
+        ufw_result = subprocess.run(ufw_cmd, capture_output=True, text=True)
+        if ufw_result.returncode != 0:
+            logger.warn(
+                f"Fail to disable ufw for {node_name}: {ufw_result.stderr}",
+                context="Multipass",
+            )
+
         ip_cmd = ["multipass", "info", node_name, "--format", "json"]
         ip_result = subprocess.run(ip_cmd, capture_output=True, text=True)
         if ip_result.returncode == 0:
