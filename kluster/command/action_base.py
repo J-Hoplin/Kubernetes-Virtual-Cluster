@@ -1,5 +1,5 @@
 import argparse
-from kluster.command.actions import init, destroy, shell, doctor
+from kluster.command.actions import init, destroy, shell, doctor, config
 
 
 def action_parser(parser: argparse.ArgumentParser):
@@ -24,6 +24,16 @@ def action_parser(parser: argparse.ArgumentParser):
         action="store_true",
     )
     init_action.set_defaults(func=init.run)
+
+    # Configuration for sub command - config
+    config_parser = action_parser.add_parser("config", help="Manage cluster configuration")
+    config_subparsers = config_parser.add_subparsers(
+        title="Config actions", dest="config_action", help="Configuration actions"
+    )
+    config_subparsers.required = True
+    # Subcommand for sub command - kluster config
+    edit_parser = config_subparsers.add_parser("edit", help="Edit cluster configuration")
+    edit_parser.set_defaults(func=config.edit)
 
     # Configuration for sub command - destroy
     destroy_parser = action_parser.add_parser("destroy", help="Destroy the cluster")

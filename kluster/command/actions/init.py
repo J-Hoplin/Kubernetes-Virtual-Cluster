@@ -12,6 +12,7 @@ from kluster.command.actions.init_multipass import check_and_download_image, cre
 from kluster.command.actions.destroy import run as destroy_run
 from kluster.utils.dependency import require_dependencies
 from kluster.utils import logger
+from kluster.utils.config import create_default_config
 
 
 def config_deserializer(config_path):
@@ -295,20 +296,16 @@ Command:
         return False
 
 
-@require_dependencies()
+@require_dependencies(dependencies=["kubectl","multipass"])
 def run(args):
-    if not os.path.isabs(args.config):
-        current_dir_config = os.path.join(os.getcwd(), args.config)
-        if os.path.exists(current_dir_config):
-            config_path = current_dir_config
-        else:
-            config_path = DEFAULT_CONFIG_PATH
+    if not os.path.exists(DEFAULT_CONFIG_PATH):
+        logger.log(f"⚠️ Config file not found at {DEFAULT_CONFIG_PATH}")
+        logger.log(f"🔄 Creating default configuration...")
+        config = create_default_config()
     else:
-        config_path = args.config
-
-    config = config_deserializer(config_path)
-    if not config:
-        return 1
+        config = config_deserializer(DEFAULT_CONFIG_PATH)
+        if not config:
+            return 1
 
     db_path = SQLITE_PATH
 
@@ -379,7 +376,8 @@ def run(args):
             insert_node_to_db(
                 cursor, node_name, node_type, cpu, memory, disk, node_config
             )
-
+        
+        connection.commit()
         # 지금 보니까 Go로 작성된 버전은 마스터노드 검사하는게 없었네...
         if master_node_count == 0:
             logger.error("Kubernetes cluster must have at least one master node")

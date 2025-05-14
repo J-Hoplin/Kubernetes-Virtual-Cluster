@@ -48,8 +48,16 @@ MacOS에서만 사용이 가능한 로컬 Kubernetes 클러스터 관리 도구�
   ```
 
   - 옵션:
-    - `--config`, `-c`: 클러스터 설정파일 경로 (기본값: `<executed-path>/cluster-config.json`)
     - `--force`, `-f`: 기존 클러스터가 있으면 삭제 후 재생성
+
+- **클러스터 config 수정**: `config`
+
+  ```
+  kluster config [sub command]
+  ```
+
+  - 서브커맨드
+    - `edit`: cluster-config.json 파일을 vim으로 열음
 
 - **특정 노드 VM Shell 접속**: `shell`
 
