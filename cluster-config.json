@@ -1,6 +1,6 @@
 {
   "k3s_version": "v1.30.11+k3s1",
-  "ubuntu_version": "24.04",
+  "ubuntu_version": "22.04",
   "nodes": {
     "master-node": {
       "type": "master",
