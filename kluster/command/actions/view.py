@@ -46,7 +46,7 @@ def run(args):
             return 0
 
     except sqlite3.Error as e:
-        logger.error(f"❌ Database error: {e}")
+        logger.error("❌ No nodes found in cluster state")
         return 1
     except Exception as e:
         logger.error(f"❌ Programmatic error: {e}")
