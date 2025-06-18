@@ -1,5 +1,5 @@
 import argparse
-from kluster.command.actions import init, destroy, shell, doctor, config
+from kluster.command.actions import init, destroy, shell, doctor, config, view
 
 
 def action_parser(parser: argparse.ArgumentParser):
@@ -50,3 +50,7 @@ def action_parser(parser: argparse.ArgumentParser):
     # Configuration for sub command - doctor
     doctor_parser = action_parser.add_parser("doctor", help="Check dependencies")
     doctor_parser.set_defaults(func=doctor.run)
+
+    # Configuration for sub command - view
+    view_parser = action_parser.add_parser("view", help="View cluster state")
+    view_parser.set_defaults(func=view.run)

@@ -50,6 +50,12 @@ MacOS에서만 사용이 가능한 로컬 Kubernetes 클러스터 관리 도구�
   - 옵션:
     - `--force`, `-f`: 기존 클러스터가 있으면 삭제 후 재생성
 
+- **클러스터 정보 조회**: `view`
+
+  ```bash
+  kluster view
+  ```
+
 - **클러스터 config 수정**: `config`
 
   ```
