@@ -1,9 +1,10 @@
 [project]
 name = "kubernetes-virtual-cluster"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-dependencies = []
+description = "Kubernetes Virtual Cluster"
+authors = [
+    {name = "Hoplin", email = "hoplin.dev@gmail.com"}
+]
 
 [tool.setuptools]
 packages = ["kluster"]
